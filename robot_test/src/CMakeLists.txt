@@ -14,5 +14,7 @@ catkin_package()
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 # Declare the executable.
+add_executable(drive drive.cpp)
 
 # Specify libraries against which to link.
+target_link_libraries(drive ${catkin_LIBRARIES})

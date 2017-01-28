@@ -118,20 +118,12 @@ include_directories(
 
 ## Declare a C++ library
 add_library(bldc_uart_beaglebone_lib
-  src/comm_uart.c
-  src/bldc_interface.c
-  src/packet.c
-  src/crc.c
-  src/bldc_interface_uart.c
-  src/buffer.c
-
-  src/comm_uart.h
-  src/bldc_interface.h
-  src/packet.h
-  src/crc.h
-  src/bldc_interface_uart.h
-  src/buffer.h
-  src/datatypes.h
+  src/comm_uart.cpp
+  src/bldc_interface.cpp
+  src/packet.cpp
+  src/crc.cpp
+  src/bldc_interface_uart.cpp
+  src/buffer.cpp
 )
 
 ## Add cmake target dependencies of the library

@@ -10,14 +10,24 @@
 
 
 // control variables // ! -- SET THESE VALUES BEFORE RUNNING -- ! //
-const int max_erpm = 0; 
+const int max_erpm = 30; 
 const float duty = 0;
 const float amps = 0;
 const float brake = 0;
 
+bool onBeagleBone = true;
 
 int main(int argc, char **argv)
 {
+	for (int i = 0; i < argc; ++i)
+	{
+		if (strcmp(argv[i], "-pc") == 0)
+		{
+			onBeagleBone = false;
+			ROS_DEBUG_STREAM("Node is not being run on a BeagleBone");
+		}
+	}
+
 	if (max_erpm == 0)
 	{
 		ROS_WARN_STREAM("Max RPM is 0");
@@ -31,7 +41,10 @@ int main(int argc, char **argv)
 	ros::NodeHandle nh;
 
 	// initialize the UART interface
-	comm_uart_init();
+	if (onBeagleBone)
+	{
+		comm_uart_init();
+	}
 
 	// set the current in amps
 	bldc_interface_set_current(amps);

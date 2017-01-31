@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>drivetest</name>
+  <name>robot2017</name>
   <version>0.0.0</version>
-  <description>The drivetest package</description>
+  <description>The robot2017 package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->

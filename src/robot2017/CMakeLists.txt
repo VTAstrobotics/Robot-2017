@@ -5,12 +5,22 @@ find_package(catkin REQUIRED COMPONENTS
   bldc_uart_beaglebone
   roscpp
   std_msgs
+  message_generation
+)
+
+add_message_files(Files
+  teleop.msg
+)
+
+generate_messages(DEPENDENCIES 
+  std_msgs
+  teleop
 )
 
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES drivetest
-  CATKIN_DEPENDS bldc_uart_beaglebone roscpp std_msgs
+  CATKIN_DEPENDS bldc_uart_beaglebone roscpp std_msgs message_runtime
 #  DEPENDS system_lib
 )
 

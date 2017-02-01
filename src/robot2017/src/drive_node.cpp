@@ -16,14 +16,14 @@ const float duty = 0;
 const float amps = 0;
 const float brake = 0;
 
+const int refreshRate = 1;
+
 bool onBeagleBone = true;
 
-/*
 void teleopReceived(const robot2017::Teleop& msg)
 {
 	ROS_INFO_STREAM("Teleop command recieved");
 }
-*/
 
 int main(int argc, char **argv)
 {
@@ -67,38 +67,41 @@ int main(int argc, char **argv)
 	// create a topic which will contain motor speed
 	ros::Publisher pub = nh.advertise<std_msgs::Int64>("/robot/rpm", 1000);
 
-	// ros::Subscriber sub = nh.subscribe("/robot/teleop", 1000, &teleopReceived);
+	ros::Subscriber sub = nh.subscribe("/robot/teleop", 1000, &teleopReceived);
 
 	std::stringstream message;
 	message << "DRIVING. Max RPM: " << max_erpm << ", duty cycle: " << duty;
 	message << ", current: " << amps << " amps, brake current: " << brake << " amps.";
 	ROS_INFO_STREAM(message.str());
 
-
 	int current_RPM = 0;
 
-	ros::Rate rate(0.333);
+	int tick = 0;
+
+	ros::Rate rate(refreshRate);
 	while(ros::ok())
 	{
-		if (current_RPM == max_erpm)
+		if (tick % (refreshRate * 6) == 0)
 		{
 			current_RPM = 0;
 			ROS_INFO_STREAM("Motors OFF");
 		}
-		else
+		else if (tick % (refreshRate * 3) == 0)
 		{
 			current_RPM = max_erpm;
 			ROS_INFO_STREAM("Motors ON");
 		}
 
 		// sets motor speed
-		bldc_interface_set_rpm(current_RPM);
+		// bldc_interface_set_rpm(current_RPM);
 
 		// publish a message containing motor speed
 		std_msgs::Int64 message;
 		message.data = current_RPM;
 		pub.publish(message);
 		rate.sleep();
+		ros::spinOnce();
+		++tick;
 	}
 
 	return 0;

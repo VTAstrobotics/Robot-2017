@@ -8,13 +8,13 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-add_message_files(Files
-  teleop.msg
+add_message_files(
+  DIRECTORY msg
+  FILES Teleop.msg
 )
 
 generate_messages(DEPENDENCIES 
   std_msgs
-  teleop
 )
 
 catkin_package(
@@ -33,7 +33,16 @@ include_directories(
 )
 
 add_executable(drive_node src/drive_node.cpp)
+add_executable(testController src/testController.cpp)
+
+add_dependencies(drive_node robot2017_generate_messages_cpp)
+add_dependencies(testController robot2017_generate_messages_cpp)
+
 target_link_libraries(drive_node
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(testController
   ${catkin_LIBRARIES}
 )
 
@@ -41,7 +50,7 @@ target_link_libraries(drive_node
 ## Install ##
 #############
 
-install(DIRECTORY lauch/
+install(DIRECTORY launch/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
   FILES_MATCHING PATTERN "*.launch"
 )

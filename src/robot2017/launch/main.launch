@@ -4,4 +4,8 @@
 
 	</node>
 
+	<node name="testController" pkg="robot2017" type="testController" output="screen">
+
+	</node>
+
 </launch>

@@ -4,18 +4,26 @@
 #include <ros/ros.h>
 #include <std_msgs/Int64.h>
 #include <string>
+#include <robot2017/Teleop.h>
 
 #include <bldc_uart_beaglebone/comm_uart.h>
 #include <bldc_uart_beaglebone/bldc_interface.h>
 
 
 // control variables // ! -- SET THESE VALUES BEFORE RUNNING -- ! //
-const int max_erpm = 30; 
+const int max_erpm = 30;
 const float duty = 0;
 const float amps = 0;
 const float brake = 0;
 
 bool onBeagleBone = true;
+
+/*
+void teleopReceived(const robot2017::Teleop& msg)
+{
+	ROS_INFO_STREAM("Teleop command recieved");
+}
+*/
 
 int main(int argc, char **argv)
 {
@@ -57,7 +65,9 @@ int main(int argc, char **argv)
 
 
 	// create a topic which will contain motor speed
-	ros::Publisher pub = nh.advertise<std_msgs::Int64>("/drive/rpm", 1000);
+	ros::Publisher pub = nh.advertise<std_msgs::Int64>("/robot/rpm", 1000);
+
+	// ros::Subscriber sub = nh.subscribe("/robot/teleop", 1000, &teleopReceived);
 
 	std::stringstream message;
 	message << "DRIVING. Max RPM: " << max_erpm << ", duty cycle: " << duty;

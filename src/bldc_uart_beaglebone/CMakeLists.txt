@@ -1,14 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(robot2017)
+project(bldc_uart_beaglebone)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  bldc_uart_beaglebone
-  roscpp
-  std_msgs
-)
+find_package(catkin REQUIRED COMPONENTS)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -100,9 +96,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES drivetest
-#  CATKIN_DEPENDS bldc_uart_beaglebone roscpp std_msgs
+   INCLUDE_DIRS include
+   LIBRARIES bldc_uart_beaglebone
+#  CATKIN_DEPENDS
 #  DEPENDS system_lib
 )
 
@@ -112,32 +108,34 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories(include/bldc_uart_beaglebone)
+# include_directories()
 
 ## Declare a C++ library
-# add_library(drivetest
-#   src/${PROJECT_NAME}/drivetest.cpp
-# )
+add_library(bldc_uart_beaglebone
+  src/bldc_interface.cpp
+  src/bldc_interface_uart.cpp
+  src/buffer.cpp
+  src/comm_uart.cpp
+  src/crc.cpp
+  src/packet.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(drivetest ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(bldc_uart_beaglebone ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-add_executable(drive_node src/drive_node.cpp)
+# add_executable(drive_node src/drive_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(drivetest_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(bldc_uart_beaglebone_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(drive_node
-  ${catkin_LIBRARIES}
-)
+# target_link_libraries(drive_node ${catkin_LIBRARIES})
+# target_link_libraries(drive_node bldc_uart_beaglebone_lib)
 
 #############
 ## Install ##
@@ -154,7 +152,7 @@ target_link_libraries(drive_node
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS drivetest drivetest_node
+# install(TARGETS bldc_uart_beaglebone bldc_uart_beaglebone_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -179,7 +177,7 @@ target_link_libraries(drive_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_drivetest.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_bldc_uart_beaglebone.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

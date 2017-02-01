@@ -20,9 +20,29 @@ const int refreshRate = 1;
 
 bool onBeagleBone = true;
 
-void teleopReceived(const robot2017::Teleop& msg)
+void teleopReceived(const robot2017::Teleop& cmd)
 {
-	ROS_INFO_STREAM("Teleop command recieved");
+	std::stringstream message;
+	
+	/*
+	message << "Command recieved: \n";
+	message << "a " << +cmd.a << " b " << +cmd.b << " x " << +cmd.x << " y " << +cmd.y;
+	message << " lb " << +cmd.lb << " rb " << +cmd.rb << " back " << +cmd.back;
+	message << " start " << +cmd.start << " l_thumb " << +cmd.l_thumb << " r_thumb " << +cmd.r_thumb;
+	message << "\nl_thumb: (" << +cmd.x_l_thumb << ", " << +cmd.y_l_thumb << ")\t";
+	message << "r_thumb: (" << +cmd.x_r_thumb << ", " << +cmd.y_l_thumb << ")\t";
+	message << "trigger: (" << +cmd.l_trig << ", " << +cmd.y_trig << ")";
+	*/
+
+	message << "Command recieved: ";
+	message << " " << +cmd.a << " " << +cmd.b << " " << +cmd.x << " " << +cmd.y;
+	message << " " << +cmd.lb << " " << +cmd.rb << " " << +cmd.back;
+	message << " " << +cmd.start << " " << +cmd.l_thumb << " " << +cmd.r_thumb;
+	message << " (" << +cmd.x_l_thumb << " " << +cmd.y_l_thumb << ")";
+	message << " (" << +cmd.x_r_thumb << " " << +cmd.y_l_thumb << ")";
+	message << " (" << +cmd.l_trig << " " << +cmd.y_trig << ")";
+	
+	ROS_DEBUG_STREAM(message.str());
 }
 
 int main(int argc, char **argv)
@@ -93,7 +113,7 @@ int main(int argc, char **argv)
 		}
 
 		// sets motor speed
-		// bldc_interface_set_rpm(current_RPM);
+		bldc_interface_set_rpm(current_RPM);
 
 		// publish a message containing motor speed
 		std_msgs::Int64 message;

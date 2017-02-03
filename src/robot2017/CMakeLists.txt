@@ -32,7 +32,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(drive_node src/drive_node.cpp)
+add_executable(drive_node src/drive_node.cpp src/motors.cpp)
 add_executable(testController src/testController.cpp)
 
 add_dependencies(drive_node robot2017_generate_messages_cpp)

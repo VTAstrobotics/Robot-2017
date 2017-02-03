@@ -17,27 +17,17 @@ Motor driveRight(1);
 
 void teleopReceived(const robot2017::Teleop& cmd)
 {
-	std::stringstream message;
-	
-	/*
-	message << "Command recieved: \n";
-	message << "a " << +cmd.a << " b " << +cmd.b << " x " << +cmd.x << " y " << +cmd.y;
-	message << " lb " << +cmd.lb << " rb " << +cmd.rb << " back " << +cmd.back;
-	message << " start " << +cmd.start << " l_thumb " << +cmd.l_thumb << " r_thumb " << +cmd.r_thumb;
-	message << "\nl_thumb: (" << +cmd.x_l_thumb << ", " << +cmd.y_l_thumb << ")\t";
-	message << "r_thumb: (" << +cmd.x_r_thumb << ", " << +cmd.y_l_thumb << ")\t";
-	message << "trigger: (" << +cmd.l_trig << ", " << +cmd.y_trig << ")";
-	*/
+    std::stringstream message;
 
-	message << "Command recieved: ";
-	message << " " << +cmd.a << " " << +cmd.b << " " << +cmd.x << " " << +cmd.y;
-	message << " " << +cmd.lb << " " << +cmd.rb << " " << +cmd.back;
-	message << " " << +cmd.start << " " << +cmd.l_thumb << " " << +cmd.r_thumb;
-	message << " (" << +cmd.x_l_thumb << " " << +cmd.y_l_thumb << ")";
-	message << " (" << +cmd.x_r_thumb << " " << +cmd.y_l_thumb << ")";
-	message << " (" << +cmd.l_trig << " " << +cmd.y_trig << ")";
-	
-	ROS_DEBUG_STREAM(message.str());
+    message << "Command recieved: ";
+    message << " " << +cmd.a << " " << +cmd.b << " " << +cmd.x << " " << +cmd.y;
+    message << " " << +cmd.lb << " " << +cmd.rb << " " << +cmd.back;
+    message << " " << +cmd.start << " " << +cmd.l_thumb << " " << +cmd.r_thumb;
+    message << " (" << +cmd.x_l_thumb << " " << +cmd.y_l_thumb << ")";
+    message << " (" << +cmd.x_r_thumb << " " << +cmd.y_l_thumb << ")";
+    message << " (" << +cmd.l_trig << " " << +cmd.y_trig << ")";
+
+    ROS_DEBUG_STREAM(message.str());
 
     // byte range should be [-100, 100]
     driveLeft.set(cmd.y_l_thumb * 1.0f / 100.0f);

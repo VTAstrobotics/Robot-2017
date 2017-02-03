@@ -15,7 +15,7 @@ bool randomBool()
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "testController");
+    ros::init(argc, argv, "test_controller");
 
     ros::NodeHandle nh;
 

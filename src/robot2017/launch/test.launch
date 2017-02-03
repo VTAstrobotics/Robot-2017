@@ -1,6 +1,6 @@
 <launch>
-    <node name="drivetest_node" pkg="robot2017" type="drive_node" args="-pc" output="screen">
+    <node name="drive_node" pkg="robot2017" type="drive_node" args="-pc" output="screen">
     </node>
-    <node name="testController" pkg="robot2017" type="testController" output="screen">
+    <node name="test_controller" pkg="robot2017" type="test_controller" output="screen">
     </node>
 </launch>

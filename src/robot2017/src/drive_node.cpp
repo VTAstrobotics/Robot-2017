@@ -24,7 +24,7 @@ void teleopReceived(const robot2017::Teleop& cmd)
     message << " " << +cmd.lb << " " << +cmd.rb << " " << +cmd.back;
     message << " " << +cmd.start << " " << +cmd.l_thumb << " " << +cmd.r_thumb;
     message << " (" << +cmd.x_l_thumb << " " << +cmd.y_l_thumb << ")";
-    message << " (" << +cmd.x_r_thumb << " " << +cmd.y_l_thumb << ")";
+    message << " (" << +cmd.x_r_thumb << " " << +cmd.y_r_thumb << ")";
     message << " (" << +cmd.l_trig << " " << +cmd.y_trig << ")";
 
     ROS_DEBUG_STREAM(message.str());
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
         if (strcmp(argv[i], "-pc") == 0)
         {
             onBeagleBone = false;
-            ROS_DEBUG_STREAM("Node is not being run on a BeagleBone");
+            ROS_WARN_STREAM("Node is not being run on a BeagleBone");
         }
     }
 
@@ -63,42 +63,12 @@ int main(int argc, char **argv)
 
     ros::Subscriber sub = nh.subscribe("/robot/teleop", 1000, &teleopReceived);
 
-//     std::stringstream message;
-//     message << "DRIVING. Max RPM: " << max_erpm << ", duty cycle: " << duty;
-//     message << ", current: " << amps << " amps, brake current: " << brake << " amps.";
-//     ROS_INFO_STREAM(message.str());
-
     int current_RPM = 0;
 
     int tick = 0;
 
     ROS_INFO("Astrobotics 2017 ready");
     ros::spin();
-/*    ros::Rate rate(refreshRate);
-    while(ros::ok())
-    {
-        if (tick % (refreshRate * 6) == 0)
-        {
-            current_RPM = 0;
-            ROS_INFO_STREAM("Motors OFF");
-        }
-        else if (tick % (refreshRate * 3) == 0)
-        {
-            current_RPM = max_erpm;
-            ROS_INFO_STREAM("Motors ON");
-        }
-
-        // sets motor speed
-        // bldc_interface_set_rpm(current_RPM);
-
-        // publish a message containing motor speed
-        std_msgs::Int64 message;
-        message.data = current_RPM;
-        pub.publish(message);
-        rate.sleep();
-        ros::spinOnce();
-        ++tick;
-    }*/
 
     return 0;
 }

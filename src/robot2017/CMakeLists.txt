@@ -33,16 +33,16 @@ include_directories(
 )
 
 add_executable(drive_node src/drive_node.cpp src/motors.cpp)
-add_executable(testController src/testController.cpp)
+add_executable(test_controller src/test_controller.cpp)
 
 add_dependencies(drive_node robot2017_generate_messages_cpp)
-add_dependencies(testController robot2017_generate_messages_cpp)
+add_dependencies(test_controller robot2017_generate_messages_cpp)
 
 target_link_libraries(drive_node
   ${catkin_LIBRARIES}
 )
 
-target_link_libraries(testController
+target_link_libraries(test_controller
   ${catkin_LIBRARIES}
 )
 

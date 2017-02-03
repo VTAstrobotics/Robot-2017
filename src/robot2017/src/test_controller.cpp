@@ -22,7 +22,6 @@ int main(int argc, char **argv)
     // create a topic which will contain motor speed
     ros::Publisher teleopPub = nh.advertise<robot2017::Teleop>("/robot/teleop", 1000);
 
-    ros::Rate rate(1);
     while(ros::ok())
     {
         // publish a teleop command message
@@ -46,7 +45,7 @@ int main(int argc, char **argv)
         command.y_trig = rand();
 
         teleopPub.publish(command);
-        rate.sleep();
+        ros::Duration(rand() % 5).sleep();
     }
 
     return 0;

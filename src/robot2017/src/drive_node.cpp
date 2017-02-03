@@ -61,6 +61,7 @@ int main(int argc, char **argv)
 
 	int tick = 0;
 
+    ROS_INFO("Astrobotics 2017 ready");
     ros::spin();
 /*	ros::Rate rate(refreshRate);
 	while(ros::ok())

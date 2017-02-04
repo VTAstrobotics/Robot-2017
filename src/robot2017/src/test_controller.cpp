@@ -42,7 +42,7 @@ int main(int argc, char **argv)
         command.x_r_thumb = rand();
         command.y_r_thumb = rand();
         command.l_trig = rand();
-        command.y_trig = rand();
+        command.r_trig = rand();
 
         teleopPub.publish(command);
         ros::Duration(rand() % 5).sleep();

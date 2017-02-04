@@ -34,7 +34,6 @@ void TeleopExec::teleopExec(const robot2017::Teleop& cmd)
             leftRatio = fmax(cmd.y_l_thumb, -cmd.x_r_thumb);
             rightRatio = cmd.y_l_thumb + cmd.x_r_thumb;
         }
-        return;
     }
     else
     {
@@ -48,7 +47,6 @@ void TeleopExec::teleopExec(const robot2017::Teleop& cmd)
             leftRatio = cmd.y_l_thumb - cmd.x_r_thumb;
             rightRatio = -fmax(-cmd.y_l_thumb, -cmd.x_r_thumb);
         }
-        return;
     }
 
     //TODO: set motor speeds using ratios
@@ -56,6 +54,9 @@ void TeleopExec::teleopExec(const robot2017::Teleop& cmd)
     std::stringstream msg;
     msg << "Left Ratio " << leftRatio << ", Right Ratio " << rightRatio;
     ROS_INFO_STREAM(msg.str());
+
+    if(fabs(leftRatio) > 0.1 || fabs(rightRatio))
+        return;
 
     if(cmd.l_trig > 1) //not sure what trigger ranges are
     {

@@ -16,4 +16,4 @@ int8 y_l_thumb
 int8 x_r_thumb
 int8 y_r_thumb
 int8 l_trig
-int8 y_trig
+int8 r_trig

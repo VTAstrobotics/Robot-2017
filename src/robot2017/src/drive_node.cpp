@@ -4,7 +4,7 @@
 #include <ros/ros.h>
 #include <std_msgs/Int64.h>
 #include <string>
-#include "robot2017/Teleop.h"
+#include "teleop_msg/Teleop.h"
 #include "motors.h"
 #include "teleop_exec.h"
 

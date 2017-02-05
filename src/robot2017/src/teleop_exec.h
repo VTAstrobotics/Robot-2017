@@ -2,7 +2,7 @@
 //handles teleop calculations
 //calls appropriate motor functions
 
-#include "robot2017/Teleop.h"
+#include "teleop_msg/Teleop.h"
 #include "motors.h"
 
 #ifndef TELEOP_EXEC_H

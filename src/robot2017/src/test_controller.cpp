@@ -3,7 +3,7 @@
 
 #include <ros/ros.h>
 #include <string>
-#include <robot2017/Teleop.h>
+#include <teleop_msg/Teleop.h>
 
 #include <stdlib.h>
 #include <time.h>

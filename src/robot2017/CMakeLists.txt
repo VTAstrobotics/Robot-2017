@@ -4,23 +4,13 @@ project(robot2017)
 find_package(catkin REQUIRED COMPONENTS
   bldc_uart_beaglebone
   roscpp
-  std_msgs
-  message_generation
-)
-
-add_message_files(
-  DIRECTORY msg
-  FILES Teleop.msg
-)
-
-generate_messages(DEPENDENCIES 
-  std_msgs
+  teleop_msg
 )
 
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES drivetest
-  CATKIN_DEPENDS bldc_uart_beaglebone roscpp std_msgs message_runtime
+  CATKIN_DEPENDS bldc_uart_beaglebone roscpp teleop_msg
 #  DEPENDS system_lib
 )
 
@@ -37,6 +27,7 @@ add_executable(test_controller src/test_controller.cpp)
 
 add_dependencies(drive_node robot2017_generate_messages_cpp)
 add_dependencies(test_controller robot2017_generate_messages_cpp)
+add_dependencies(teleop_message)
 
 target_link_libraries(drive_node
   ${catkin_LIBRARIES}

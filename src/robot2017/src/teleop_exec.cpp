@@ -12,7 +12,7 @@ float rightRatio;
 Motor driveLeft(0);
 Motor driveRight(1);
 
-void TeleopExec::teleopExec(const robot2017::Teleop& cmd)
+void TeleopExec::teleopExec(const teleop_msg::Teleop& cmd)
 {
     dead = !cmd.lb;
     //write LED??? (did this last year)

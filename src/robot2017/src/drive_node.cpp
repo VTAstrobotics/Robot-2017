@@ -14,7 +14,7 @@ bool onBeagleBone = true;
 ros::Publisher pub;
 TeleopExec teleop;
 
-void teleopReceived(const robot2017::Teleop& cmd)
+void teleopReceived(const teleop_msg::Teleop& cmd)
 {
     std::stringstream message;
 

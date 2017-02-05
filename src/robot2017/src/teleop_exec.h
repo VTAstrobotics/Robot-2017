@@ -16,7 +16,7 @@ class TeleopExec
         float rightRatio;
 
     public:
-        void teleopExec(const robot2017::Teleop& cmd);
+        void teleopExec(const teleop_msg::Teleop& cmd);
         void killMotors();
 };
 

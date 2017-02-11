@@ -2,7 +2,7 @@
 //handles teleop calculations
 //calls appropriate motor functions
 
-#include "teleop_msg/Teleop.h"
+#include "robot_msgs/Teleop.h"
 #include "motors.h"
 
 #ifndef TELEOP_EXEC_H
@@ -16,7 +16,7 @@ class TeleopExec
         float rightRatio;
 
     public:
-        void teleopExec(const teleop_msg::Teleop& cmd);
+        void teleopExec(const robot_msgs::Teleop& cmd);
         void killMotors();
 };
 

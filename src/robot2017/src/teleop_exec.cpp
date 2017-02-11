@@ -1,5 +1,5 @@
 #include "teleop_exec.h"
-#include "teleop_msg/Teleop.h"
+#include "robot_msgs/Teleop.h"
 #include "motors.h"
 #include <ros/ros.h>
 #include <std_msgs/Int64.h>
@@ -12,7 +12,7 @@ float rightRatio;
 Motor driveLeft(0);
 Motor driveRight(1);
 
-void TeleopExec::teleopExec(const teleop_msg::Teleop& cmd)
+void TeleopExec::teleopExec(const robot_msgs::Teleop& cmd)
 {
     dead = !cmd.lb;
     //write LED??? (did this last year)

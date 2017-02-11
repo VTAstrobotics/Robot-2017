@@ -3,7 +3,7 @@
 
 #include <ros/ros.h>
 #include <string>
-#include <teleop_msg/Teleop.h>
+#include <robot_msgs/Teleop.h>
 
 #include <stdlib.h>
 #include <time.h>
@@ -20,7 +20,7 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
 
     // create a topic which will contain motor speed
-    ros::Publisher teleopPub = nh.advertise<teleop_msg::Teleop>("/robot/teleop", 1000);
+    ros::Publisher teleopPub = nh.advertise<robot_msgs::Teleop>("/robot/teleop", 1000);
     int count = 0;
     while(ros::ok())
     {
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 
 
         // publish a teleop command message
-        teleop_msg::Teleop command;
+        robot_msgs::Teleop command;
 
         command.a = randomBool();
         command.b = randomBool();

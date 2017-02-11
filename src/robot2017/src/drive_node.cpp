@@ -4,7 +4,7 @@
 #include <ros/ros.h>
 #include <std_msgs/Int64.h>
 #include <string>
-#include "teleop_msg/Teleop.h"
+#include "robot_msgs/Teleop.h"
 #include "motors.h"
 #include "teleop_exec.h"
 
@@ -14,7 +14,7 @@ bool onBeagleBone = true;
 ros::Publisher pub;
 TeleopExec teleop;
 
-void teleopReceived(const teleop_msg::Teleop& cmd)
+void teleopReceived(const robot_msgs::Teleop& cmd)
 {
     std::stringstream message;
 

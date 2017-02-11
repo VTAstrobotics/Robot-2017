@@ -1,5 +1,5 @@
 - setup-file:
     local-name: /opt/ros/kinetic/setup.sh
 - git:
-    local-name: teleop_msg
-    uri: https://github.com/VTAstrobotics/teleop_msg
+    local-name: robot_msgs
+    uri: https://github.com/VTAstrobotics/robot_msgs

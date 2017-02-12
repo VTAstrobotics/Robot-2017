@@ -4,7 +4,7 @@
 #include <bldc_uart_beaglebone/comm_uart.h>
 #include <bldc_uart_beaglebone/bldc_interface.h>
 #else
-// TODO Talon PWM includes
+#include <beaglebone_pwm/BBB_Pwm.h>
 #endif
 
 #ifdef MOTORS_VESC_UART

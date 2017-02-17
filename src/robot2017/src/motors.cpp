@@ -30,7 +30,10 @@ void Motor::init() {
     // set the duty cycle
     bldc_interface_set_duty_cycle(duty);
 #else
-    // TODO Talon PWM init if applicable
+    // initialize BBB_Pwm
+    PWM bbb_pwm("P9_13");
+    init_Pwm();
+    bbb_pwm.enable_Pwm();
 #endif
 }
 

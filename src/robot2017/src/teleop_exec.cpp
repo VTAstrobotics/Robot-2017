@@ -5,12 +5,62 @@
 #include <std_msgs/Int64.h>
 #include <string>
 
-bool dead = true;
+dead = true;
+autonomyActive = false;
+
 float leftRatio;
 float rightRatio;
 
 Motor driveLeft(0);
 Motor driveRight(1);
+
+void teleopReceived(const robot_msgs::Teleop& cmd)
+{
+    std::stringstream message;
+
+    message << "Teleop Command recieved: ";
+    message << " " << +cmd.a << " " << +cmd.b << " " << +cmd.x << " " << +cmd.y;
+    message << " " << +cmd.lb << " " << +cmd.rb << " " << +cmd.back;
+    message << " " << +cmd.start << " " << +cmd.l_thumb << " " << +cmd.r_thumb;
+    message << " (" << +cmd.x_l_thumb << " " << +cmd.y_l_thumb << ")";
+    message << " (" << +cmd.x_r_thumb << " " << +cmd.y_r_thumb << ")";
+    message << " (" << +cmd.l_trig << " " << +cmd.r_trig << ")";
+
+    ROS_INFO_STREAM(message.str());
+
+
+    //if autonomy mode is toggled (y button is pressed)
+    if (cmd.y == 1)
+        autonomyActive = !autonomyActive; //toggle autonomy state
+    if(autonomyActive)
+        return;
+    else
+    {
+        //function for teleop
+        teleopExec(cmd);
+    }
+
+
+    // byte range should be [-100, 100]
+    //driveLeft.set(cmd.y_l_thumb * 1.0f / 100.0f);
+    //driveRight.set(cmd.y_r_thumb * 1.0f / 100.0f);
+}
+
+void autonomyReceived(const robot_msgs::Autonomy& cmd)
+{
+    std::stringstream message;
+
+    message << "Autonomy Command recieved: ";
+    message << " " << +cmd.a << " " << +cmd.b << " " << +cmd.x << " " << +cmd.y;
+    message << " " << +cmd.lb << " " << +cmd.rb << " " << +cmd.back;
+
+    ROS_INFO_STREAM(message.str());
+
+    if(autonomyActive)
+    {
+        autonomyExec(cmd);
+    }
+}
 
 void TeleopExec::teleopExec(const robot_msgs::Teleop& cmd)
 {
@@ -71,8 +121,15 @@ void TeleopExec::teleopExec(const robot_msgs::Teleop& cmd)
     }
 }
 
+void TeleopExec::autonomyExec(const robot_msgs::Autonomy& cmd)
+{
+
+}
+
 void TeleopExec::killMotors()
 {
     //TODO
     ROS_INFO_STREAM("KILL MOTORS");
 }
+
+

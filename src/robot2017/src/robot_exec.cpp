@@ -5,16 +5,20 @@
 #include <std_msgs/Int64.h>
 #include <string>
 
-bool dead = true;
-bool autonomyActive = false;
 
-float leftRatio;
-float rightRatio;
+RobotExec::RobotExec()
+{
+    bool dead = true;
+    bool autonomyActive = false;
 
-Motor driveLeft(0);
-Motor driveRight(1);
+    float leftRatio = 0;
+    float rightRatio = 0;
 
-void teleopReceived(const robot_msgs::Teleop& cmd, RobotExec exec)
+    Motor driveLeft(0);
+    Motor driveRight(1);
+}
+
+void teleopReceived(const robot_msgs::Teleop& cmd, RobotExec& exec)
 {
     std::stringstream message;
 
@@ -31,8 +35,8 @@ void teleopReceived(const robot_msgs::Teleop& cmd, RobotExec exec)
 
     //if autonomy mode is toggled (y button is pressed)
     if (cmd.y == 1)
-        autonomyActive = !autonomyActive; //toggle autonomy state
-    if(autonomyActive)
+        exec.autonomyActive = !exec.autonomyActive; //toggle autonomy state
+    if(exec.autonomyActive)
         return;
     else
     {
@@ -46,7 +50,7 @@ void teleopReceived(const robot_msgs::Teleop& cmd, RobotExec exec)
     //driveRight.set(cmd.y_r_thumb * 1.0f / 100.0f);
 }
 
-void autonomyReceived(const robot_msgs::Autonomy& cmd, RobotExec exec)
+void autonomyReceived(const robot_msgs::Autonomy& cmd, RobotExec& exec)
 {
     std::stringstream message;
 

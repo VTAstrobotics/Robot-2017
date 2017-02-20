@@ -13,7 +13,7 @@ const int refreshRate = 1;
 bool onBeagleBone = true;
 bool autState = false;
 ros::Publisher pub;
-RobotExec exec;
+RobotExec exec = RobotExec();
 
 int main(int argc, char **argv)
 {
@@ -25,7 +25,6 @@ int main(int argc, char **argv)
             ROS_WARN_STREAM("Node is not being run on a BeagleBone");
         }
     }
-
 
     // initialize the ROS system.
     ros::init(argc, argv, "drive_node");

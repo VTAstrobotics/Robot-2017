@@ -18,8 +18,8 @@ class RobotExec
         float rightRatio;
 
     public:
-        void teleopReceived(const robot_msgs::Teleop& cmd);
-        void autonomyReceived(const robot_msgs::Autonomy& cmd);
+        void teleopReceived(const robot_msgs::Teleop& cmd, RobotExec exec);
+        void autonomyReceived(const robot_msgs::Autonomy& cmd, RobotExec exec);
 
         void teleopExec(const robot_msgs::Teleop& cmd);
         void autonomyExec(const robot_msgs::Autonomy& cmd);

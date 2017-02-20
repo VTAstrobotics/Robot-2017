@@ -6,14 +6,14 @@
 #include <string>
 #include "robot_msgs/Teleop.h"
 #include "motors.h"
-#include "teleop_exec.h"
+#include "robot_exec.h"
 
 const int refreshRate = 1;
 
 bool onBeagleBone = true;
 bool autState = false;
 ros::Publisher pub;
-RobotExec teleop;
+RobotExec exec;
 
 int main(int argc, char **argv)
 {
@@ -42,8 +42,8 @@ int main(int argc, char **argv)
     // create a topic which will contain motor speed
     pub = nh.advertise<std_msgs::Int64>("/robot/rpm", 1000);
 
-    ros::Subscriber sub_aut = nh.subscribe("/robot/teleop", 1000, &RobotExec::autonomyReceived);
-    ros::Subscriber sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived);
+    ros::Subscriber sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
+    ros::Subscriber sub_aut = nh.subscribe("/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);
 
     int current_RPM = 0;
 
@@ -51,7 +51,6 @@ int main(int argc, char **argv)
 
     ROS_INFO("Astrobotics 2017 ready");
     ros::spin();
-
     return 0;
 
 }

@@ -1,4 +1,4 @@
-#include "teleop_exec.h"
+#include "robot_exec.h"
 #include "robot_msgs/Teleop.h"
 #include "motors.h"
 #include <ros/ros.h>
@@ -14,7 +14,7 @@ float rightRatio;
 Motor driveLeft(0);
 Motor driveRight(1);
 
-void teleopReceived(const robot_msgs::Teleop& cmd)
+void teleopReceived(const robot_msgs::Teleop& cmd, RobotExec exec)
 {
     std::stringstream message;
 
@@ -37,7 +37,7 @@ void teleopReceived(const robot_msgs::Teleop& cmd)
     else
     {
         //function for teleop
-        RobotExec::teleopExec(cmd);
+        exec.teleopExec(cmd);
     }
 
 
@@ -46,7 +46,7 @@ void teleopReceived(const robot_msgs::Teleop& cmd)
     //driveRight.set(cmd.y_r_thumb * 1.0f / 100.0f);
 }
 
-void autonomyReceived(const robot_msgs::Autonomy& cmd)
+void autonomyReceived(const robot_msgs::Autonomy& cmd, RobotExec exec)
 {
     std::stringstream message;
 
@@ -56,7 +56,7 @@ void autonomyReceived(const robot_msgs::Autonomy& cmd)
 
     if(autonomyActive)
     {
-        RobotExec::autonomyExec(cmd);
+        exec.autonomyExec(cmd);
     }
 }
 

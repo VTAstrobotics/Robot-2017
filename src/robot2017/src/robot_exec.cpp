@@ -5,8 +5,8 @@
 #include <std_msgs/Int64.h>
 #include <string>
 
-dead = true;
-autonomyActive = false;
+bool dead = true;
+bool autonomyActive = false;
 
 float leftRatio;
 float rightRatio;
@@ -37,7 +37,7 @@ void teleopReceived(const robot_msgs::Teleop& cmd)
     else
     {
         //function for teleop
-        teleopExec(cmd);
+        RobotExec::teleopExec(cmd);
     }
 
 
@@ -51,18 +51,16 @@ void autonomyReceived(const robot_msgs::Autonomy& cmd)
     std::stringstream message;
 
     message << "Autonomy Command recieved: ";
-    message << " " << +cmd.a << " " << +cmd.b << " " << +cmd.x << " " << +cmd.y;
-    message << " " << +cmd.lb << " " << +cmd.rb << " " << +cmd.back;
 
     ROS_INFO_STREAM(message.str());
 
     if(autonomyActive)
     {
-        autonomyExec(cmd);
+        RobotExec::autonomyExec(cmd);
     }
 }
 
-void TeleopExec::teleopExec(const robot_msgs::Teleop& cmd)
+void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 {
     dead = !cmd.lb;
     //write LED??? (did this last year)
@@ -121,12 +119,12 @@ void TeleopExec::teleopExec(const robot_msgs::Teleop& cmd)
     }
 }
 
-void TeleopExec::autonomyExec(const robot_msgs::Autonomy& cmd)
+void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
 {
 
 }
 
-void TeleopExec::killMotors()
+void RobotExec::killMotors()
 {
     //TODO
     ROS_INFO_STREAM("KILL MOTORS");

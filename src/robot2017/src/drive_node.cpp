@@ -13,7 +13,7 @@ const int refreshRate = 1;
 bool onBeagleBone = true;
 bool autState = false;
 ros::Publisher pub;
-TeleopExec teleop;
+RobotExec teleop;
 
 int main(int argc, char **argv)
 {
@@ -42,8 +42,8 @@ int main(int argc, char **argv)
     // create a topic which will contain motor speed
     pub = nh.advertise<std_msgs::Int64>("/robot/rpm", 1000);
 
-    ros::Subscriber sub_aut = nh.subscribe("/robot/teleop", 1000, &autonomyReceived);
-    ros::Subscriber sub_tele = nh.subscribe("/robot/teleop", 1000, &teleopReceived);
+    ros::Subscriber sub_aut = nh.subscribe("/robot/teleop", 1000, &RobotExec::autonomyReceived);
+    ros::Subscriber sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived);
 
     int current_RPM = 0;
 

@@ -20,8 +20,8 @@ class RobotExec
     public:
         RobotExec(); //constructor
 
-        void teleopReceived(const robot_msgs::Teleop& cmd, RobotExec exec);
-        void autonomyReceived(const robot_msgs::Autonomy& cmd, RobotExec exec);
+        void teleopReceived(const robot_msgs::Teleop& cmd);
+        void autonomyReceived(const robot_msgs::Autonomy& cmd);
 
         void teleopExec(const robot_msgs::Teleop& cmd);
         void autonomyExec(const robot_msgs::Autonomy& cmd);

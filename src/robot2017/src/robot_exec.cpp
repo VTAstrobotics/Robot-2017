@@ -18,7 +18,7 @@ RobotExec::RobotExec()
     Motor driveRight(1);
 }
 
-void teleopReceived(const robot_msgs::Teleop& cmd, RobotExec& exec)
+void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)
 {
     std::stringstream message;
 
@@ -35,13 +35,13 @@ void teleopReceived(const robot_msgs::Teleop& cmd, RobotExec& exec)
 
     //if autonomy mode is toggled (y button is pressed)
     if (cmd.y == 1)
-        exec.autonomyActive = !exec.autonomyActive; //toggle autonomy state
-    if(exec.autonomyActive)
+        this->autonomyActive = !(this->autonomyActive); //toggle autonomy state
+    if(this->autonomyActive)
         return;
     else
     {
         //function for teleop
-        exec.teleopExec(cmd);
+        teleopExec(cmd);
     }
 
 
@@ -50,7 +50,7 @@ void teleopReceived(const robot_msgs::Teleop& cmd, RobotExec& exec)
     //driveRight.set(cmd.y_r_thumb * 1.0f / 100.0f);
 }
 
-void autonomyReceived(const robot_msgs::Autonomy& cmd, RobotExec& exec)
+void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
 {
     std::stringstream message;
 
@@ -58,9 +58,9 @@ void autonomyReceived(const robot_msgs::Autonomy& cmd, RobotExec& exec)
 
     ROS_INFO_STREAM(message.str());
 
-    if(autonomyActive)
+    if(this->autonomyActive)
     {
-        exec.autonomyExec(cmd);
+        autonomyExec(cmd);
     }
 }
 

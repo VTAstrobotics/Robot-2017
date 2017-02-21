@@ -118,7 +118,8 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 
 void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
 {
-
+  //TODO: actually send motor commands
+  ROS_INFO_STREAM("EXECUTING AUTONOMY CMDS");
 }
 
 void RobotExec::killMotors()

@@ -6,35 +6,14 @@
 #include <string>
 #include "robot_msgs/Teleop.h"
 #include "motors.h"
-#include "teleop_exec.h"
+#include "robot_exec.h"
 
 const int refreshRate = 1;
 
 bool onBeagleBone = true;
+bool autState = false;
 ros::Publisher pub;
-TeleopExec teleop;
-
-void teleopReceived(const robot_msgs::Teleop& cmd)
-{
-    std::stringstream message;
-
-    message << "Command recieved: ";
-    message << " " << +cmd.a << " " << +cmd.b << " " << +cmd.x << " " << +cmd.y;
-    message << " " << +cmd.lb << " " << +cmd.rb << " " << +cmd.back;
-    message << " " << +cmd.start << " " << +cmd.l_thumb << " " << +cmd.r_thumb;
-    message << " (" << +cmd.x_l_thumb << " " << +cmd.y_l_thumb << ")";
-    message << " (" << +cmd.x_r_thumb << " " << +cmd.y_r_thumb << ")";
-    message << " (" << +cmd.l_trig << " " << +cmd.r_trig << ")";
-
-    ROS_INFO_STREAM(message.str());
-
-    //function for
-    teleop.teleopExec(cmd);
-
-    // byte range should be [-100, 100]
-    //driveLeft.set(cmd.y_l_thumb * 1.0f / 100.0f);
-    //driveRight.set(cmd.y_r_thumb * 1.0f / 100.0f);
-}
+RobotExec exec;
 
 int main(int argc, char **argv)
 {
@@ -46,7 +25,6 @@ int main(int argc, char **argv)
             ROS_WARN_STREAM("Node is not being run on a BeagleBone");
         }
     }
-
 
     // initialize the ROS system.
     ros::init(argc, argv, "drive_node");
@@ -63,7 +41,8 @@ int main(int argc, char **argv)
     // create a topic which will contain motor speed
     pub = nh.advertise<std_msgs::Int64>("/robot/rpm", 1000);
 
-    ros::Subscriber sub = nh.subscribe("/robot/teleop", 1000, &teleopReceived);
+    ros::Subscriber sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
+    ros::Subscriber sub_aut = nh.subscribe("/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);
 
     int current_RPM = 0;
 
@@ -71,7 +50,6 @@ int main(int argc, char **argv)
 
     ROS_INFO("Astrobotics 2017 ready");
     ros::spin();
-
     return 0;
 
 }

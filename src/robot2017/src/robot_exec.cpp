@@ -6,16 +6,10 @@
 #include <string>
 
 
-RobotExec::RobotExec()
+RobotExec::RobotExec() : dead(true), autonomyActive(false),
+                         leftRatio(0.0f), rightRatio(0.0f),
+                         driveLeft(0), driveRight(1)
 {
-    bool dead = true;
-    bool autonomyActive = false;
-
-    float leftRatio = 0;
-    float rightRatio = 0;
-
-    Motor driveLeft(0);
-    Motor driveRight(1);
 }
 
 void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)
@@ -43,7 +37,6 @@ void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)
         //function for teleop
         teleopExec(cmd);
     }
-
 
     // byte range should be [-100, 100]
     //driveLeft.set(cmd.y_l_thumb * 1.0f / 100.0f);

@@ -13,7 +13,7 @@ const int refreshRate = 1;
 bool onBeagleBone = true;
 bool autState = false;
 ros::Publisher pub;
-RobotExec exec = RobotExec();
+RobotExec exec;
 
 int main(int argc, char **argv)
 {

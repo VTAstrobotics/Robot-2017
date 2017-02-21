@@ -16,6 +16,8 @@ class RobotExec
         bool autonomyActive;
         float leftRatio;
         float rightRatio;
+        Motor driveLeft;
+        Motor driveRight;
 
     public:
         RobotExec(); //constructor

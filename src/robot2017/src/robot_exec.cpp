@@ -5,6 +5,8 @@
 #include <std_msgs/Int64.h>
 #include <string>
 
+Motor left(0);
+Motor right(1);
 
 RobotExec::RobotExec() : dead(true), autonomyActive(false),
                          leftRatio(0.0f), rightRatio(0.0f),
@@ -94,8 +96,8 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
         }
     }
 
-    //TODO: set motor speeds using ratios
-    //currently just printing ratios for debugging purpose
+    left.set(leftRatio);
+    right.set(rightRatio);
     std::stringstream msg;
     msg << "Left Ratio " << leftRatio << ", Right Ratio " << rightRatio;
     ROS_INFO_STREAM(msg.str());
@@ -105,7 +107,7 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 
     if(cmd.l_trig > 1) //not sure what trigger ranges are
     {
-        //TODO: dumping mechanism commands
+        //TODO: dumping mechanism commandsq
         ROS_INFO_STREAM("ENTERED DUMPING STATE");
     }
 
@@ -118,14 +120,16 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 
 void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
 {
-  //TODO: actually send motor commands
-  ROS_INFO_STREAM("EXECUTING AUTONOMY CMDS");
+    ROS_INFO_STREAM("EXECUTING AUTONOMY CMDS");
+    left.set(cmd.leftRatio);
+    right.set(cmd.rightRatio);
 }
 
 void RobotExec::killMotors()
 {
-    //TODO
     ROS_INFO_STREAM("KILL MOTORS");
+    left.set(0);
+    right.set(0);
 }
 
 

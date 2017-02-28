@@ -15,6 +15,11 @@ bool autState = false;
 ros::Publisher pub;
 RobotExec exec;
 
+//Command line arguments - order doesn't matter (other than debug type must follow -debug)
+//-pc: Running test on PC instead of beaglebone
+//-debug: Hardcodes some values in order to test specific features
+//-aut: Tests autonomy - hardcodes autonomyActive to 1 (true), does not subscribe to teleop messages
+//TODO: any other specific states we want to test?
 int main(int argc, char **argv)
 {
     for (int i = 0; i < argc; ++i)
@@ -24,6 +29,13 @@ int main(int argc, char **argv)
             onBeagleBone = false;
             ROS_WARN_STREAM("Node is not being run on a BeagleBone");
         }
+		else if (strcmp(argv[i], "-debug") == 0)
+		{
+			if(strcmp(argv[i+1], "-aut") == 0)
+			{
+				exec.autonomyActive = true;
+			}
+		}
     }
 
     // initialize the ROS system.
@@ -41,7 +53,8 @@ int main(int argc, char **argv)
     // create a topic which will contain motor speed
     pub = nh.advertise<std_msgs::Int64>("/robot/rpm", 1000);
 
-    ros::Subscriber sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
+	if (exec.autonomyActive == false) //autonomy debugging, don't want teleop commands interfering if true
+		ros::Subscriber sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
     ros::Subscriber sub_aut = nh.subscribe("/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);
 
     int current_RPM = 0;

@@ -107,7 +107,7 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 
     if(cmd.l_trig > 1) //not sure what trigger ranges are
     {
-        //TODO: dumping mechanism commandsq
+        //TODO: dumping mechanism commands
         ROS_INFO_STREAM("ENTERED DUMPING STATE");
     }
 

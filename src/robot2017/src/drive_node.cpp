@@ -53,8 +53,10 @@ int main(int argc, char **argv)
     // create a topic which will contain motor speed
     pub = nh.advertise<std_msgs::Int64>("/robot/rpm", 1000);
 
-    if (!exec.isAutonomyActive()) //autonomy debugging, don't want teleop commands interfering if true
+    //autonomy debugging, don't want teleop commands interfering if true
+    if (!exec.isAutonomyActive()) {
         ros::Subscriber sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
+    }
     ros::Subscriber sub_aut = nh.subscribe("/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);
 
     int current_RPM = 0;
@@ -62,14 +64,14 @@ int main(int argc, char **argv)
     int tick = 0;
 
     ROS_INFO("Astrobotics 2017 ready");
-    
+
     ros::Rate r(100); //100 Hz/10 ms (is this the freq. we want?)
     while(true)
     {
         ros::spinOnce();
-    r.sleep();
+        r.sleep();
     }
-    ros::spin();
+
     return 0;
 
 }

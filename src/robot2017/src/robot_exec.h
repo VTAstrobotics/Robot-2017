@@ -28,6 +28,9 @@ class RobotExec
         void teleopExec(const robot_msgs::Teleop& cmd);
         void autonomyExec(const robot_msgs::Autonomy& cmd);
         void killMotors();
+
+        bool isAutonomyActive();
+        void setAutonomyActive(bool active);
 };
 
 #endif

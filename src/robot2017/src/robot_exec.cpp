@@ -128,4 +128,12 @@ void RobotExec::killMotors()
     ROS_INFO_STREAM("KILL MOTORS");
 }
 
+bool RobotExec::isAutonomyActive()
+{
+    return autonomyActive;
+}
 
+void RobotExec::setAutonomyActive(bool active)
+{
+    autonomyActive = active;
+}

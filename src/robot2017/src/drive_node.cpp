@@ -33,7 +33,7 @@ int main(int argc, char **argv)
         {
             if(strcmp(argv[i+1], "-aut") == 0)
             {
-                exec.autonomyActive = true;
+                exec.setAutonomyActive(true);
             }
         }
     }
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
     // create a topic which will contain motor speed
     pub = nh.advertise<std_msgs::Int64>("/robot/rpm", 1000);
 
-    if (exec.autonomyActive == false) //autonomy debugging, don't want teleop commands interfering if true
+    if (!exec.isAutonomyActive()) //autonomy debugging, don't want teleop commands interfering if true
         ros::Subscriber sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
     ros::Subscriber sub_aut = nh.subscribe("/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);
 

@@ -5,8 +5,9 @@ This repository is a catkin workspace, containing the packages that comprise the
 Assuming you have ROS already installed on your system, run the following commands:
 
 1. `source /opt/ros/kinetic/setup.bash` if you have not already
-2. `wstool update -t src` to initialize the other Astrobotics packages
-3. `catkin_make` in the current directory to build the robot code
+2. `git submodule init` to initialize the Git submodules
+3. `git submodule updates` to clone the required packages
+4. `catkin_make` in the current directory to build the robot code
 
 ## Running
 After building, run the following commands:

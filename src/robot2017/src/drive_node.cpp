@@ -62,6 +62,13 @@ int main(int argc, char **argv)
     int tick = 0;
 
     ROS_INFO("Astrobotics 2017 ready");
+	
+    ros::Rate r(100); //100 Hz/10 ms (is this the freq. we want?)
+    while(true)
+    {
+        ros::spinOnce();
+	r.sleep();
+    }
     ros::spin();
     return 0;
 

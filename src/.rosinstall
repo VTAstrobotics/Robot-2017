@@ -1,5 +1,0 @@
-- setup-file:
-    local-name: /opt/ros/kinetic/setup.sh
-- git:
-    local-name: robot_msgs
-    uri: https://github.com/VTAstrobotics/robot_msgs

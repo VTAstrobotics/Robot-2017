@@ -132,4 +132,12 @@ void RobotExec::killMotors()
     right.set(0);
 }
 
+bool RobotExec::isAutonomyActive()
+{
+    return autonomyActive;
+}
 
+void RobotExec::setAutonomyActive(bool active)
+{
+    autonomyActive = active;
+}

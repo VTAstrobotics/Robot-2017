@@ -42,8 +42,7 @@
 #define BAUDRATE B9600   // Change as needed, keep B
 
 /* change this definition for the correct port */
-#define MODEMDEVICE1 "/dev/ttyO1" //Beaglebone Black serial port (UART1)
-#define MODEMDEVICE2 "/dev/ttyO2" //Beaglebone Black serial port (UART2)
+#define MODEMDEVICE "/dev/ttyO1" //Beaglebone Black serial port (UART1)
 
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 
@@ -195,7 +194,6 @@ static void send_packet(unsigned char *data, unsigned int len) {
 }*/
 
 void comm_uart_init() {
-	
 	// Initialize UART
 	
 	struct termios newtio;
@@ -223,12 +221,10 @@ void comm_uart_init() {
     newtio.c_lflag = ICANON;
 	
     // Load the pin configuration
-
-	int ret = system("echo BB-UART1 > /sys/devices/bone_capemgr.9/slots");
 	/* Open modem device for reading and writing and not as controlling tty
     because we don't want to get killed if linenoise sends CTRL-C. */
-    fd = open(MODEMDEVICE1, O_RDWR | O_NOCTTY );
-    if (fd < 0) { perror(MODEMDEVICE1); exit(-1); }
+    fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY );
+    if (fd < 0) { perror(MODEMDEVICE); exit(-1); }
     
     /* now clean the modem line and activate the settings for the port */
     tcflush(fd, TCIFLUSH);

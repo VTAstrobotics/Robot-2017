@@ -1,3 +1,6 @@
 [submodule "src/robot_msgs"]
 	path = src/robot_msgs
 	url = https://github.com/VTAstrobotics/robot_msgs.git
+[submodule "src/vesc_bbb_uart"]
+	path = src/vesc_bbb_uart
+	url = https://github.com/VTAstrobotics/VESC_BBB_UART.git

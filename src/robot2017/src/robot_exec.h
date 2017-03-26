@@ -4,7 +4,7 @@
 
 #include "robot_msgs/Teleop.h"
 #include "robot_msgs/Autonomy.h"
-#include "motors.h"
+#include <vesc_bbb_uart/bldc.h>
 
 #ifndef ROBOT_EXEC_H
 #define ROBOT_EXEC_H
@@ -16,8 +16,11 @@ class RobotExec
         bool autonomyActive;
         float leftRatio;
         float rightRatio;
-        Motor driveLeft;
-        Motor driveRight;
+        BLDC LeftDrive;
+        BLDC RightDrive;
+        BLDC Lift;
+        BLDC Storage;
+        BLDC Bucket;
 
     public:
         RobotExec(); //constructor

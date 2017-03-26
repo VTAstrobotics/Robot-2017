@@ -1,16 +1,17 @@
 #include "robot_exec.h"
 #include "robot_msgs/Teleop.h"
-#include "motors.h"
+#include <vesc_bbb_uart/bldc.h>
 #include <ros/ros.h>
 #include <std_msgs/Int64.h>
 #include <string>
 
-Motor left(0);
-Motor right(1);
-
 RobotExec::RobotExec() : dead(true), autonomyActive(false),
                          leftRatio(0.0f), rightRatio(0.0f),
-                         driveLeft(0), driveRight(1)
+                         LeftDrive(LEFTDRIVE, CIM), 
+                         RightDrive(RIGHTDRIVE, CIM),
+                         Lift(LIFT, Alien_4260),
+                         Storage(STORAGE, Alien_4260),
+                         Bucket(BUCKET, Alien_4260)
 {
 }
 
@@ -96,8 +97,8 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
         }
     }
 
-    left.set(leftRatio);
-    right.set(rightRatio);
+    LeftDrive.set_Speed(leftRatio);
+    RightDrive.set_Speed(rightRatio);
     std::stringstream msg;
     msg << "Left Ratio " << leftRatio << ", Right Ratio " << rightRatio;
     ROS_INFO_STREAM(msg.str());
@@ -121,15 +122,18 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
 {
     ROS_INFO_STREAM("EXECUTING AUTONOMY CMDS");
-    left.set(cmd.leftRatio);
-    right.set(cmd.rightRatio);
+    LeftDrive.set_Speed(cmd.leftRatio);
+    RightDrive.set_Speed(cmd.rightRatio);
 }
 
 void RobotExec::killMotors()
 {
     ROS_INFO_STREAM("KILL MOTORS");
-    left.set(0);
-    right.set(0);
+    LeftDrive.set_Speed(0);
+    RightDrive.set_Speed(0);
+    Lift.set_Speed(0);
+    Storage.set_Speed(0);
+    Bucket.set_Speed(0);
 }
 
 bool RobotExec::isAutonomyActive()

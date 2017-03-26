@@ -1,8 +1,8 @@
 #include "motors.h"
 
 #ifdef MOTORS_VESC_UART
-#include <bldc_uart_beaglebone/comm_uart.h>
-#include <bldc_uart_beaglebone/bldc_interface.h>
+#include <vesc_bbb_uart/comm_uart.h>
+#include <vesc_bbb_uart/bldc_interface.h>
 #else
 #include <beaglebone_pwm/BBB_Pwm.h>
 #endif

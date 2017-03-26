@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(robot2017)
 
 find_package(catkin REQUIRED COMPONENTS
-  bldc_uart_beaglebone
+  vesc_bbb_uart
   beaglebone_pwm
   roscpp
   robot_msgs
@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES drivetest
-  CATKIN_DEPENDS bldc_uart_beaglebone beaglebone_pwm roscpp robot_msgs
+  CATKIN_DEPENDS vesc_bbb_uart beaglebone_pwm roscpp robot_msgs
 #  DEPENDS system_lib
 )
 

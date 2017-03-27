@@ -4,6 +4,7 @@
 
 #include "robot_msgs/Teleop.h"
 #include "robot_msgs/Autonomy.h"
+#include "robot_msgs/MotorFeedback.h"
 #include "motors.h"
 
 #ifndef ROBOT_EXEC_H
@@ -18,6 +19,7 @@ class RobotExec
         float rightRatio;
         Motor driveLeft;
         Motor driveRight;
+		ros::NodeHandle nh;
 		ros::Publisher pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/feedback", 100);
 
     public:

@@ -18,6 +18,7 @@ class RobotExec
         float rightRatio;
         Motor driveLeft;
         Motor driveRight;
+		ros::Publisher pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/feedback", 100);
 
     public:
         RobotExec(); //constructor
@@ -31,6 +32,8 @@ class RobotExec
 
         bool isAutonomyActive();
         void setAutonomyActive(bool active);
+
+		void publishMotors();
 };
 
 #endif

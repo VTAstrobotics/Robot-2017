@@ -1,5 +1,7 @@
 #include "robot_exec.h"
 #include "robot_msgs/Teleop.h"
+#include "robot_msgs/Autonomy.h"
+#include "robot_msgs/MotorFeedback.h"
 #include "motors.h"
 #include <ros/ros.h>
 #include <std_msgs/Int64.h>
@@ -57,6 +59,7 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
     {
         autonomyExec(cmd);
     }
+	publishMotors();
 }
 
 void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
@@ -140,4 +143,23 @@ bool RobotExec::isAutonomyActive()
 void RobotExec::setAutonomyActive(bool active)
 {
     autonomyActive = active;
+}
+
+void RobotExec::publishMotors()
+{
+	robot_msgs::MotorFeedback fb;
+
+	//get RPM methods will be implemented here
+	//for now, send dummy values
+
+	ROS_INFO_STREAM("GETTING MOTOR DATA");
+
+	//testing random dummy values
+	fb.drumRPM = 1000;
+	fb.liftPos = 77.77;
+	fb.leftTreadRPM = 0;
+	fb.rightTreadRPM = 16.101;
+
+	//publish using publisher defined as class variable
+	this->pub_fb.publish(fb);
 }

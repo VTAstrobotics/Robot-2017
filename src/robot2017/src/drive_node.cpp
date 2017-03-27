@@ -5,6 +5,7 @@
 #include <std_msgs/Int64.h>
 #include <string>
 #include "robot_msgs/Teleop.h"
+#include "robot_msgs/Autonomy.h"
 #include "motors.h"
 #include "robot_exec.h"
 

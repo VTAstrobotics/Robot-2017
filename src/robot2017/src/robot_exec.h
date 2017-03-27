@@ -6,6 +6,7 @@
 #include "robot_msgs/Autonomy.h"
 #include "robot_msgs/MotorFeedback.h"
 #include "motors.h"
+#include <ros/ros.h>
 
 #ifndef ROBOT_EXEC_H
 #define ROBOT_EXEC_H

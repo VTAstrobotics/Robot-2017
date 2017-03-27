@@ -59,7 +59,7 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
     {
         autonomyExec(cmd);
     }
-	publishMotors();
+    publishMotors();
 }
 
 void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
@@ -147,19 +147,19 @@ void RobotExec::setAutonomyActive(bool active)
 
 void RobotExec::publishMotors()
 {
-	robot_msgs::MotorFeedback fb;
+    robot_msgs::MotorFeedback fb;
 
-	//get RPM methods will be implemented here
-	//for now, send dummy values
+    //get RPM methods will be implemented here
+    //for now, send dummy values
 
-	ROS_INFO_STREAM("GETTING MOTOR DATA");
+    ROS_INFO_STREAM("GETTING MOTOR DATA");
 
-	//testing random dummy values
-	fb.drumRPM = 1000;
-	fb.liftPos = 77.77;
-	fb.leftTreadRPM = 0;
-	fb.rightTreadRPM = 16.101;
+    //testing random dummy values
+    fb.drumRPM = 1000;
+    fb.liftPos = 77.77;
+    fb.leftTreadRPM = 0;
+    fb.rightTreadRPM = 16.101;
 
-	//publish using publisher defined as class variable
-	this->pub_fb.publish(fb);
+    //publish using publisher defined as class variable
+    this->pub_fb.publish(fb);
 }

@@ -13,6 +13,7 @@ RobotExec::RobotExec() : dead(true), autonomyActive(false),
                          Storage(STORAGE, Alien_4260),
                          Bucket(BUCKET, Alien_4260)
 {
+    BLDC::init(0);
 }
 
 void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)

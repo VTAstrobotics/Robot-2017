@@ -18,12 +18,12 @@ include_directories(src/${PROJECT_NAME})
 
 add_library(${PROJECT_NAME}
   src/${PROJECT_NAME}/bldc.cpp
-  src/${PROJECT_NAME}/bldc_interface.cpp
-  src/${PROJECT_NAME}/bldc_interface_uart.cpp
-  src/${PROJECT_NAME}/buffer.cpp
-  src/${PROJECT_NAME}/comm_uart.cpp
-  src/${PROJECT_NAME}/crc.cpp
-  src/${PROJECT_NAME}/packet.cpp
+  src/${PROJECT_NAME}/bldc_interface.c
+  src/${PROJECT_NAME}/bldc_interface_uart.c
+  src/${PROJECT_NAME}/buffer.c
+  src/${PROJECT_NAME}/comm_uart.c
+  src/${PROJECT_NAME}/crc.c
+  src/${PROJECT_NAME}/packet.c
 )
 
 #############

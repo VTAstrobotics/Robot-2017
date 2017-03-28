@@ -14,7 +14,6 @@ const int refreshRate = 1;
 bool onBeagleBone = true;
 bool autState = false;
 ros::Publisher pub;
-RobotExec exec;
 
 //Command line arguments - order doesn't matter (other than debug type must follow -debug)
 //-pc: Running test on PC instead of beaglebone
@@ -23,6 +22,10 @@ RobotExec exec;
 //TODO: any other specific states we want to test?
 int main(int argc, char **argv)
 {
+    // initialize the ROS system.
+    ros::init(argc, argv, "drive_node");
+    RobotExec exec;
+
     for (int i = 0; i < argc; ++i)
     {
         if (strcmp(argv[i], "-pc") == 0)
@@ -38,9 +41,6 @@ int main(int argc, char **argv)
             }
         }
     }
-
-    // initialize the ROS system.
-    ros::init(argc, argv, "drive_node");
 
     // establish this program as an ROS node.
     ros::NodeHandle nh;

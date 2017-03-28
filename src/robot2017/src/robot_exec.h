@@ -21,7 +21,7 @@ class RobotExec
         Motor driveLeft;
         Motor driveRight;
         ros::NodeHandle nh;
-        ros::Publisher pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/feedback", 100);
+        ros::Publisher pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/autonomy/feedback", 100);
 
     public:
         RobotExec(); //constructor

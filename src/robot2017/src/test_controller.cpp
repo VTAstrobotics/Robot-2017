@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <string>
 #include <robot_msgs/Teleop.h>
+#include <robot_msgs/MotorFeedback.h>
 
 #include <stdlib.h>
 #include <time.h>
@@ -11,6 +12,17 @@
 bool randomBool()
 {
   return rand() % 2 == 1;
+}
+
+void printFbCmd(const robot_msgs::MotorFeedback& cmd)
+{
+    std::stringstream message;
+
+    message << "Feedback Command recieved: ";
+    message << " " << +cmd.drumRPM << " " << +cmd.liftPos;
+    message << " " << +cmd.leftTreadRPM << " " << +cmd.rightTreadRPM;
+
+    ROS_INFO_STREAM(message.str());
 }
 
 int main(int argc, char **argv)
@@ -91,15 +103,4 @@ int main(int argc, char **argv)
     }
 
     return 0;
-}
-
-void printFbCmd(const robot_msgs::MotorFeedback& cmd)
-{
-    std::stringstream message;
-
-    message << "Feedback Command recieved: ";
-    message << " " << +cmd.drumRPM << " " << +cmd.liftPos;
-    message << " " << +cmd.leftTreadRPM << " " << +cmd.rightTreadRPM;
-
-    ROS_INFO_STREAM(message.str());
 }

@@ -3,4 +3,6 @@
     </node>
     <node name="test_controller" pkg="robot2017" type="test_controller" output="screen">
     </node>
+    <node name="rosserial_python" type="serial_node.py" name="serial_node">
+    </node>
 </launch>

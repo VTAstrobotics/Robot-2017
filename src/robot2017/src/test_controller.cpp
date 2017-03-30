@@ -21,6 +21,10 @@ int main(int argc, char **argv)
 
     // create a topic which will contain motor speed
     ros::Publisher teleopPub = nh.advertise<robot_msgs::Teleop>("/robot/teleop", 1000);
+
+    //subscribe to MotorFeedback topic
+    ros::Subscriber fbSub = nh.subscribe("/robot/autonomy/feedback", 1000, &printFbCmd);
+    
     int count = 0;
     while(ros::ok())
     {
@@ -87,4 +91,15 @@ int main(int argc, char **argv)
     }
 
     return 0;
+}
+
+void printFbCmd(const robot_msgs::MotorFeedback& cmd)
+{
+    std::stringstream message;
+
+    message << "Feedback Command recieved: ";
+    message << " " << +cmd.drumRPM << " " << +cmd.liftPos;
+    message << " " << +cmd.leftTreadRPM << " " << +cmd.rightTreadRPM;
+
+    ROS_INFO_STREAM(message.str());
 }

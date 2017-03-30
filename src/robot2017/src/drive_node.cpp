@@ -13,7 +13,6 @@ const int refreshRate = 1;
 
 bool onBeagleBone = true;
 bool autState = false;
-ros::Publisher pub;
 
 //Command line arguments - order doesn't matter (other than debug type must follow -debug)
 //-pc: Running test on PC instead of beaglebone
@@ -50,9 +49,6 @@ int main(int argc, char **argv)
     {
         Motor::init();
     }
-  
-    // create a topic which will contain motor speed
-    pub = nh.advertise<std_msgs::Int64>("/robot/rpm", 1000);
 
     //autonomy debugging, don't want teleop commands interfering if true
     if (!exec.isAutonomyActive()) {

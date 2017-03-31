@@ -34,10 +34,7 @@ int main(int argc, char **argv)
         }
         else if (strcmp(argv[i], "-debug") == 0)
         {
-            if(strcmp(argv[i+1], "-aut") == 0)
-            {
-                exec.setAutonomyActive(true);
-            }
+            exec.setDebugMode(true);
         }
     }
 
@@ -50,10 +47,7 @@ int main(int argc, char **argv)
         Motor::init();
     }
 
-    //autonomy debugging, don't want teleop commands interfering if true
-    if (!exec.isAutonomyActive()) {
-        ros::Subscriber sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
-    }
+    ros::Subscriber sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
 
     ros::Subscriber sub_aut = nh.subscribe("/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);
 

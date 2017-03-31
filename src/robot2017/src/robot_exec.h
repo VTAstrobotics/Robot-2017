@@ -16,6 +16,7 @@ class RobotExec
     private:
         bool dead;
         bool autonomyActive;
+        bool debug;
         float leftRatio;
         float rightRatio;
         Motor driveLeft;
@@ -35,6 +36,9 @@ class RobotExec
 
         bool isAutonomyActive();
         void setAutonomyActive(bool active);
+
+        bool isDebugMode();
+        void setDebugMode(bool active);
 
         void publishMotors();
 };

@@ -10,7 +10,7 @@
 Motor left(0);
 Motor right(1);
 
-RobotExec::RobotExec() : dead(true), autonomyActive(false),
+RobotExec::RobotExec() : dead(true), autonomyActive(false), debug(false),
                          leftRatio(0.0f), rightRatio(0.0f),
                          driveLeft(0), driveRight(1)
 {
@@ -18,6 +18,10 @@ RobotExec::RobotExec() : dead(true), autonomyActive(false),
 
 void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)
 {
+    //if debugging, ignore teleop cmds
+    if (this->debug)
+        return;
+
     std::stringstream message;
 
     message << "Teleop Command recieved: ";
@@ -143,6 +147,16 @@ bool RobotExec::isAutonomyActive()
 void RobotExec::setAutonomyActive(bool active)
 {
     autonomyActive = active;
+}
+
+void RobotExec::isDebugMode()
+{
+    return debug;
+}
+
+void RobotExec::setDebugMode(bool active)
+{
+    debug = active;
 }
 
 void RobotExec::publishMotors()

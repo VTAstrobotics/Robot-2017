@@ -38,6 +38,10 @@ int main(int argc, char **argv)
         }
     }
 
+    //temporarily hardcoding this
+    exec.setDebugMode(true);
+    exec.setAutonomyActive(true);
+
     // establish this program as an ROS node.
     ros::NodeHandle nh;
 
@@ -51,12 +55,27 @@ int main(int argc, char **argv)
 
     ros::Subscriber sub_aut = nh.subscribe("/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);
 
+    ros::Publisher pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/autonomy/feedback", 100);
+
+    robot_msgs::MotorFeedback motorFb;
+
     ROS_INFO("Astrobotics 2017 ready");
 
     ros::Rate r(100); //100 Hz/10 ms (is this the freq. we want?)
     while(ros::ok())
     {
         ros::spinOnce();
+        
+        if (exec.isAutonomyActive())
+        {
+            motorFb = exec.publishMotors();
+            std::stringstream msg;
+            msg << motorFb.drumRPM << " " << motorFb.liftPos << " " << motorFb.leftTreadRPM
+            << " " << motorFb.rightTreadRPM;
+            ROS_INFO_STREAM(msg.str());
+            pub_fb.publish(motorFb);
+        }
+
         r.sleep();
     }
 

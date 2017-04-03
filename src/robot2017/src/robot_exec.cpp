@@ -55,7 +55,8 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
 {
     std::stringstream message;
 
-    message << "Autonomy Command recieved: ";
+    message << "Autonomy Command recieved: " << cmd.leftRatio << " "
+    << cmd.rightRatio << " " << cmd.digCmd << " " << cmd.dumpCmd;;
 
     ROS_INFO_STREAM(message.str());
 
@@ -159,7 +160,7 @@ void RobotExec::setDebugMode(bool active)
     debug = active;
 }
 
-void RobotExec::publishMotors()
+robot_msgs::MotorFeedback RobotExec::publishMotors()
 {
     robot_msgs::MotorFeedback fb;
 
@@ -174,6 +175,5 @@ void RobotExec::publishMotors()
     fb.leftTreadRPM = 0;
     fb.rightTreadRPM = 16.101;
 
-    //publish using publisher defined as class variable
-    this->pub_fb.publish(fb);
+    return fb;
 }

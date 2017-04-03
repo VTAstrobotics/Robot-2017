@@ -21,8 +21,6 @@ class RobotExec
         float rightRatio;
         Motor driveLeft;
         Motor driveRight;
-        ros::NodeHandle nh;
-        ros::Publisher pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/autonomy/feedback", 100);
 
     public:
         RobotExec(); //constructor
@@ -40,7 +38,7 @@ class RobotExec
         bool isDebugMode();
         void setDebugMode(bool active);
 
-        void publishMotors();
+        robot_msgs::MotorFeedback publishMotors();
 };
 
 #endif

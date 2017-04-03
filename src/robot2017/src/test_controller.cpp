@@ -17,6 +17,9 @@ bool randomBool()
 
 void printFbCmd(const robot_msgs::MotorFeedback& cmd)
 {
+    //see if callback function is actually called
+    ROS_WARN_STREAM("Inside feedback callback");
+
     std::stringstream message;
 
     message << "Feedback Command recieved: ";
@@ -39,11 +42,12 @@ int main(int argc, char **argv)
     ros::Publisher autonomyPub = nh.advertise<robot_msgs::Autonomy>("/robot/autonomy", 1000);
 
     //subscribe to MotorFeedback topic
-    ros::Subscriber fbSub = nh.subscribe("/robot/autonomy/feedback", 1000, &printFbCmd);
+    ros::Subscriber fbSub = nh.subscribe("/robot/autonomy/feedback", 100, &printFbCmd);
     
     int count = 0;
     while(ros::ok())
     {
+        ros::spinOnce();
         ros::Duration(2).sleep(); //sleep for 2 sec between messages
 
 

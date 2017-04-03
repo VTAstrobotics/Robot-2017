@@ -149,7 +149,7 @@ void RobotExec::setAutonomyActive(bool active)
     autonomyActive = active;
 }
 
-void RobotExec::isDebugMode()
+bool RobotExec::isDebugMode()
 {
     return debug;
 }

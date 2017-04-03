@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <string>
 #include <robot_msgs/Teleop.h>
+#include <robot_msgs/Autonomy.h>
 #include <robot_msgs/MotorFeedback.h>
 
 #include <stdlib.h>
@@ -31,8 +32,11 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
-    // create a topic which will contain motor speed
+    // create a topic for teleop cmds
     ros::Publisher teleopPub = nh.advertise<robot_msgs::Teleop>("/robot/teleop", 1000);
+
+    //create topic for autonomy cmds
+    ros::Publisher autonomyPub = nh.advertise<robot_msgs::Autonomy>("/robot/autonomy", 1000);
 
     //subscribe to MotorFeedback topic
     ros::Subscriber fbSub = nh.subscribe("/robot/autonomy/feedback", 1000, &printFbCmd);
@@ -100,6 +104,16 @@ int main(int argc, char **argv)
         }
         count++;
         teleopPub.publish(command);
+
+
+        //publish autonomy message
+        robot_msgs::Autonomy autonomyCmd;
+        autonomyCmd.leftRatio = rand();
+        autonomyCmd.rightRatio = rand();
+        autonomyCmd.digCmd = rand();
+        autonomyCmd.dumpCmd = rand();
+        
+        autonomyPub.publish(autonomyCmd);
     }
 
     return 0;

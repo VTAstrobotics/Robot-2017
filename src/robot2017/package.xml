@@ -38,12 +38,12 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>bldc_uart_beaglebone</build_depend>
+  <build_depend>vesc_bbb_uart</build_depend>
   <build_depend>beaglebone_pwm</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>robot_msgs</build_depend>
-  <run_depend>bldc_uart_beaglebone</run_depend>
+  <run_depend>vesc_bbb_uart</run_depend>
   <run_depend>beaglebone_pwm</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>std_msgs</run_depend>

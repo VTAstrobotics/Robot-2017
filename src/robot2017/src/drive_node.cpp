@@ -5,7 +5,6 @@
 #include <std_msgs/Int64.h>
 #include <string>
 #include "robot_msgs/Teleop.h"
-#include "motors.h"
 #include "robot_exec.h"
 
 const int refreshRate = 1;
@@ -44,12 +43,6 @@ int main(int argc, char **argv)
     // establish this program as an ROS node.
     ros::NodeHandle nh;
 
-    // initialize the motors interface
-    if (onBeagleBone)
-    {
-        Motor::init();
-    }
-  
     // create a topic which will contain motor speed
     pub = nh.advertise<std_msgs::Int64>("/robot/rpm", 1000);
 

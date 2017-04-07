@@ -44,9 +44,6 @@ int main(int argc, char **argv)
     // establish this program as an ROS node.
     ros::NodeHandle nh;
 
-    // create a topic which will contain motor speed
-    pub = nh.advertise<std_msgs::Int64>("/robot/rpm", 1000);
-
     ros::Subscriber sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
 
     ros::Subscriber sub_aut = nh.subscribe("/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);

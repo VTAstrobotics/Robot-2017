@@ -6,7 +6,7 @@ Assuming you have ROS already installed on your system, run the following comman
 
 1. `source /opt/ros/kinetic/setup.bash` if you have not already
 2. `git submodule init` to initialize the Git submodules
-3. `git submodule updates` to clone the required packages
+3. `git submodule update` to clone the required packages
 4. `catkin_make` in the current directory to build the robot code
 
 ## Running

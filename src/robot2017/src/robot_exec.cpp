@@ -114,13 +114,13 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     if(fabs(leftRatio) > 0.1 || fabs(rightRatio))
         return;
 
-    if(cmd.l_trig > 1) //not sure what trigger ranges are
+    if(cmd.l_trig > 0.0f)
     {
         //TODO: dumping mechanism commands
         ROS_INFO_STREAM("ENTERED DUMPING STATE");
     }
 
-    if(cmd.r_trig > 1)
+    if(cmd.r_trig > 0.0f)
     {
         //TODO: dig commands
         ROS_INFO_STREAM("ENTERED DIG STATE");

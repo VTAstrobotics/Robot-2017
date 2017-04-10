@@ -54,8 +54,15 @@ int main(int argc, char **argv)
 
     ROS_INFO("Astrobotics 2017 ready");
 
-    ros::Rate r(1); //100 Hz/10 ms (is this the freq. we want?)
-    //decreased ros rate to help with debugging
+    if (exec.isDebugMode())
+    {
+        ros::Rate r(1); //slow rate when in debug mode
+    }
+    else
+    {
+        ros::Rate r(100); //100 Hz/10 ms (is this the freq. we want?)
+    }
+
     while(ros::ok())
     {
         ros::spinOnce();

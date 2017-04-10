@@ -1,11 +1,12 @@
 #include "robot_exec.h"
 #include "robot_msgs/Teleop.h"
-#include <vesc_bbb_uart/bldc.h>
+#include "robot_msgs/Autonomy.h"
+#include "robot_msgs/MotorFeedback.h"
 #include <ros/ros.h>
 #include <std_msgs/Int64.h>
 #include <string>
 
-RobotExec::RobotExec() : dead(true), autonomyActive(false),
+RobotExec::RobotExec() : dead(true), autonomyActive(false), debug(false),
                          leftRatio(0.0f), rightRatio(0.0f),
                          LeftDrive(LEFTDRIVE, CIM), 
                          RightDrive(RIGHTDRIVE, CIM),
@@ -18,6 +19,10 @@ RobotExec::RobotExec() : dead(true), autonomyActive(false),
 
 void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)
 {
+    //if debugging, ignore teleop cmds
+    if (this->debug)
+        return;
+
     std::stringstream message;
 
     message << "Teleop Command recieved: ";
@@ -51,7 +56,8 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
 {
     std::stringstream message;
 
-    message << "Autonomy Command recieved: ";
+    message << "Autonomy Command recieved: " << cmd.leftRatio << " "
+    << cmd.rightRatio << " " << cmd.digCmd << " " << cmd.dumpCmd;;
 
     ROS_INFO_STREAM(message.str());
 
@@ -59,6 +65,7 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
     {
         autonomyExec(cmd);
     }
+    publishMotors();
 }
 
 void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
@@ -145,4 +152,32 @@ bool RobotExec::isAutonomyActive()
 void RobotExec::setAutonomyActive(bool active)
 {
     autonomyActive = active;
+}
+
+bool RobotExec::isDebugMode()
+{
+    return debug;
+}
+
+void RobotExec::setDebugMode(bool active)
+{
+    debug = active;
+}
+
+robot_msgs::MotorFeedback RobotExec::publishMotors()
+{
+    robot_msgs::MotorFeedback fb;
+
+    //get RPM methods will be implemented here
+    //for now, send dummy values
+
+    ROS_INFO_STREAM("GETTING MOTOR DATA");
+
+    //testing random dummy values
+    fb.drumRPM = 1000;
+    fb.liftPos = 77.77;
+    fb.leftTreadRPM = 0;
+    fb.rightTreadRPM = 16.101;
+
+    return fb;
 }

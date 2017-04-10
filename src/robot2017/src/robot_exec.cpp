@@ -1,21 +1,28 @@
 #include "robot_exec.h"
 #include "robot_msgs/Teleop.h"
-#include "motors.h"
+#include "robot_msgs/Autonomy.h"
+#include "robot_msgs/MotorFeedback.h"
 #include <ros/ros.h>
 #include <std_msgs/Int64.h>
 #include <string>
 
-Motor left(0);
-Motor right(1);
-
-RobotExec::RobotExec() : dead(true), autonomyActive(false),
+RobotExec::RobotExec() : dead(true), autonomyActive(false), debug(false),
                          leftRatio(0.0f), rightRatio(0.0f),
-                         driveLeft(0), driveRight(1)
+                         LeftDrive(LEFTDRIVE, CIM), 
+                         RightDrive(RIGHTDRIVE, CIM),
+                         Lift(LIFT, Alien_4260),
+                         Storage(STORAGE, Alien_4260),
+                         Bucket(BUCKET, Alien_4260)
 {
+    BLDC::init((char*) "/dev/ttyO1");
 }
 
 void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)
 {
+    //if debugging, ignore teleop cmds
+    if (this->debug)
+        return;
+
     std::stringstream message;
 
     message << "Teleop Command recieved: ";
@@ -49,7 +56,8 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
 {
     std::stringstream message;
 
-    message << "Autonomy Command recieved: ";
+    message << "Autonomy Command recieved: " << cmd.leftRatio << " "
+    << cmd.rightRatio << " " << cmd.digCmd << " " << cmd.dumpCmd;;
 
     ROS_INFO_STREAM(message.str());
 
@@ -57,6 +65,7 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
     {
         autonomyExec(cmd);
     }
+    publishMotors();
 }
 
 void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
@@ -96,8 +105,8 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
         }
     }
 
-    left.set(leftRatio);
-    right.set(rightRatio);
+    LeftDrive.set_Speed(leftRatio);
+    RightDrive.set_Speed(rightRatio);
     std::stringstream msg;
     msg << "Left Ratio " << leftRatio << ", Right Ratio " << rightRatio;
     ROS_INFO_STREAM(msg.str());
@@ -105,13 +114,13 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     if(fabs(leftRatio) > 0.1 || fabs(rightRatio))
         return;
 
-    if(cmd.l_trig > 1) //not sure what trigger ranges are
+    if(cmd.l_trig > 0.0f)
     {
         //TODO: dumping mechanism commands
         ROS_INFO_STREAM("ENTERED DUMPING STATE");
     }
 
-    if(cmd.r_trig > 1)
+    if(cmd.r_trig > 0.0f)
     {
         //TODO: dig commands
         ROS_INFO_STREAM("ENTERED DIG STATE");
@@ -121,15 +130,18 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
 {
     ROS_INFO_STREAM("EXECUTING AUTONOMY CMDS");
-    left.set(cmd.leftRatio);
-    right.set(cmd.rightRatio);
+    LeftDrive.set_Speed(cmd.leftRatio);
+    RightDrive.set_Speed(cmd.rightRatio);
 }
 
 void RobotExec::killMotors()
 {
     ROS_INFO_STREAM("KILL MOTORS");
-    left.set(0);
-    right.set(0);
+    LeftDrive.set_Speed(0);
+    RightDrive.set_Speed(0);
+    Lift.set_Speed(0);
+    Storage.set_Speed(0);
+    Bucket.set_Speed(0);
 }
 
 bool RobotExec::isAutonomyActive()
@@ -140,4 +152,32 @@ bool RobotExec::isAutonomyActive()
 void RobotExec::setAutonomyActive(bool active)
 {
     autonomyActive = active;
+}
+
+bool RobotExec::isDebugMode()
+{
+    return debug;
+}
+
+void RobotExec::setDebugMode(bool active)
+{
+    debug = active;
+}
+
+robot_msgs::MotorFeedback RobotExec::publishMotors()
+{
+    robot_msgs::MotorFeedback fb;
+
+    //get RPM methods will be implemented here
+    //for now, send dummy values
+
+    ROS_INFO_STREAM("GETTING MOTOR DATA");
+
+    //testing random dummy values
+    fb.drumRPM = 1000;
+    fb.liftPos = 77.77;
+    fb.leftTreadRPM = 0;
+    fb.rightTreadRPM = 16.101;
+
+    return fb;
 }

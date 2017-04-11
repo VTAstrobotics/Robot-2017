@@ -1,8 +1,4 @@
 <launch>
-    <node name="drive_node" pkg="robot2017" type="drive_node" args="-pc" output="screen">
-    </node>
-    <node name="test_controller" pkg="robot2017" type="test_controller" output="screen">
-    </node>
     <node name="watchdog_node" pkg="robot2017" type="watchdog_node" output="screen">
     </node>
     <node pkg="rosserial_python" type="serial_node.py" name="serial_node">

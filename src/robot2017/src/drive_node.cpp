@@ -53,15 +53,18 @@ int main(int argc, char **argv)
     robot_msgs::MotorFeedback motorFb;
 
     ROS_INFO("Astrobotics 2017 ready");
-
+    
+    int hertz;
     if (exec.isDebugMode())
     {
-        ros::Rate r(1); //slow rate when in debug mode
+        hertz = 1; //slow rate when in debug mode
     }
     else
     {
-        ros::Rate r(100); //100 Hz/10 ms (is this the freq. we want?)
+        hertz = 100; //100 Hz/10 ms (is this the freq. we want?)
     }
+
+    ros::Rate r(hertz);
 
     while(ros::ok())
     {

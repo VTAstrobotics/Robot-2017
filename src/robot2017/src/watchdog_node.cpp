@@ -27,6 +27,12 @@ int main(int argc, char **argv)
     {
         ros::spinOnce();
 
+        std::stringstream message;
+        message << "Watchdog data: " << +wd.batVoltage << " " << +wd.stateOfCharge << " " << +wd.cell1Temp;
+        message << " " << +wd.cell2Temp << " " << +wd.dcConverterTemp << " " << +wd.current << " " << +wd.cpuTemp;
+        message << " " << +wd.ssrTemp << " " << +wd.boxTemp << " " << +wd.vcc << " " << +wd.timeFromLastStop << " " << +wd.totalKWH;
+        ROS_INFO_STREAM(message.str());
+
         pub.publish(wd);
     }
 

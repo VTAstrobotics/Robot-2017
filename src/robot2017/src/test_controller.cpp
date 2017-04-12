@@ -6,9 +6,24 @@
 #include <robot_msgs/Teleop.h>
 #include <robot_msgs/Autonomy.h>
 #include <robot_msgs/MotorFeedback.h>
+#include <robot_msgs/Ping.h>
 
 #include <stdlib.h>
 #include <time.h>
+
+ros::Subscriber ping_in;
+ros::Publisher ping_out;
+
+void recievedPing(const robot_msgs::Ping& ping)
+{
+    if (ping.data == 0)
+    {
+        ROS_DEBUG_STREAM("Recieved ping from robot. Responding...");
+        robot_msgs::Ping response;
+        response.data = 1;
+        ping_out.publish(response);
+    }
+}
 
 bool randomBool()
 {
@@ -44,13 +59,18 @@ int main(int argc, char **argv)
     //subscribe to MotorFeedback topic
     ros::Subscriber fbSub = nh.subscribe("/robot/autonomy/feedback", 100, &printFbCmd);
     
+    ping_out = nh.advertise<robot_msgs::Ping>("/robot/ping", 1000);
+    ping_in = nh.subscribe("/robot/ping", 1000, &recievedPing);
+    
+    ros::Rate r(10);
+    
     int count = 0;
     while(ros::ok())
     {
         ros::spinOnce();
-        ros::Duration(2).sleep(); //sleep for 2 sec between messages
+        r.sleep();
 
-
+        /*
         // publish a teleop command message
         robot_msgs::Teleop command;
 
@@ -118,6 +138,8 @@ int main(int argc, char **argv)
         autonomyCmd.dumpCmd = rand();
         
         autonomyPub.publish(autonomyCmd);
+        */
+        
     }
 
     return 0;

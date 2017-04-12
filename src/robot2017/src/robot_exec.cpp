@@ -14,7 +14,7 @@ RobotExec::RobotExec() : dead(true), autonomyActive(false), debug(false),
                          Storage(STORAGE, Alien_4260),
                          Bucket(BUCKET, Alien_4260)
 {
-    BLDC::init((char*) "/dev/ttyO1");
+    // BLDC::init((char*) "/dev/ttyO1");
 }
 
 void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)
@@ -171,7 +171,7 @@ robot_msgs::MotorFeedback RobotExec::publishMotors()
     //get RPM methods will be implemented here
     //for now, send dummy values
 
-    ROS_INFO_STREAM("GETTING MOTOR DATA");
+    // ROS_DEBUG_STREAM("GETTING MOTOR DATA");
 
     //testing random dummy values
     fb.drumRPM = 1000;

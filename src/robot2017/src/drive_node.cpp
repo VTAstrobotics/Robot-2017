@@ -10,9 +10,11 @@
 #include "robot_exec.h"
 
 const int refreshRate = 1;
-const double pingRate = 0.75; // hertz
+const double pingRate = 4; // hertz
 bool onBeagleBone = true;
 bool autState = false;
+// 0 - connected, 1 - disconnected, 2 - pending response
+int connection = 0;
 
 RobotExec exec;
 
@@ -31,11 +33,17 @@ void publishPing(const ros::TimerEvent& event)
     robot_msgs::Ping msg;
     msg.data = 0;
     ping_out.publish(msg);
+    connection = 2;
 }
 
 void recievedPing(const robot_msgs::Ping& ping)
 {
-    if (ping.data == 1) ROS_INFO_STREAM("Confirmed connection with driver station.");
+    if (ping.data == 1)
+    {
+        ROS_DEBUG_STREAM("Confirmed connection with driver station.");
+        connection = 0;
+    }
+    else connection = 1;
 }
 
 int main(int argc, char **argv)
@@ -59,8 +67,8 @@ int main(int argc, char **argv)
 
     //temporarily hardcoding this
     exec.setDebugMode(true);
-    exec.setAutonomyActive(false); // just to test ping operation
-
+    exec.setAutonomyActive(true);
+    
     sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
     sub_aut = nh.subscribe("/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);
 
@@ -78,21 +86,27 @@ int main(int argc, char **argv)
     int hertz;
     if (exec.isDebugMode())
     {
-        hertz = 100; //slow rate when in debug mode
+        hertz = 1; //slow rate when in debug mode
     }
     else
     {
         hertz = 100; //100 Hz/10 ms (is this the freq. we want?)
     }
 
-    ROS_WARN_STREAM(hertz);
     ros::Rate r(hertz);
 
     while(ros::ok())
     {
         ros::spinOnce();
         
-        if (exec.isAutonomyActive())
+        ROS_WARN_STREAM(connection);
+        if (connection == 1)
+        {
+            ROS_WARN_STREAM("DISCONNECTED FROM CONTROLLER.");
+            exec.killMotors();
+            ros::Duration(5).sleep();
+        }
+        else if (exec.isAutonomyActive())
         {
             motorFb = exec.publishMotors();
             std::stringstream msg;
@@ -101,7 +115,7 @@ int main(int argc, char **argv)
             // ROS_INFO_STREAM(msg.str());
             pub_fb.publish(motorFb);
         }
-
+        
         r.sleep();
     }
 

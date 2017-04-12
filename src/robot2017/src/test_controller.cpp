@@ -32,9 +32,6 @@ bool randomBool()
 
 void printFbCmd(const robot_msgs::MotorFeedback& cmd)
 {
-    //see if callback function is actually called
-    ROS_WARN_STREAM("Inside feedback callback");
-
     std::stringstream message;
 
     message << "Feedback Command recieved: ";
@@ -62,7 +59,7 @@ int main(int argc, char **argv)
     ping_out = nh.advertise<robot_msgs::Ping>("/robot/ping", 1000);
     ping_in = nh.subscribe("/robot/ping", 1000, &recievedPing);
     
-    ros::Rate r(10);
+    ros::Rate r(1);
     
     int count = 0;
     while(ros::ok())
@@ -70,7 +67,6 @@ int main(int argc, char **argv)
         ros::spinOnce();
         r.sleep();
 
-        /*
         // publish a teleop command message
         robot_msgs::Teleop command;
 
@@ -129,7 +125,7 @@ int main(int argc, char **argv)
         count++;
         teleopPub.publish(command);
 
-
+  
         //publish autonomy message
         robot_msgs::Autonomy autonomyCmd;
         autonomyCmd.leftRatio = rand();
@@ -138,7 +134,6 @@ int main(int argc, char **argv)
         autonomyCmd.dumpCmd = rand();
         
         autonomyPub.publish(autonomyCmd);
-        */
         
     }
 

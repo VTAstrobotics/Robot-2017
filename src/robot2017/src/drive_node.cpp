@@ -20,6 +20,7 @@ int main(int argc, char **argv)
     // initialize the ROS system.
     ros::init(argc, argv, "drive_node");
 
+    // argument processing
     bool onPC = false;
     bool debug = false;
     bool autoEnable = false;
@@ -43,10 +44,6 @@ int main(int argc, char **argv)
 
     RobotExec exec(onPC, debug, autoEnable);
 
-    //temporarily hardcoding this
-    exec.setDebugMode(true);
-    exec.setAutonomyActive(true);
-
     // establish this program as an ROS node.
     ros::NodeHandle nh;
 
@@ -61,7 +58,7 @@ int main(int argc, char **argv)
     ROS_INFO("Astrobotics 2017 ready");
     
     int hertz;
-    if (exec.isDebugMode())
+    if (exec.isDebugMode()) // FIXME we probably don't want this in the future
     {
         hertz = 1; //slow rate when in debug mode
     }

@@ -37,11 +37,13 @@ class RobotExec
         void autonomyExec(const robot_msgs::Autonomy& cmd);
         void killMotors();
 
-        bool isAutonomyActive();
-        void setAutonomyActive(bool active);
+        bool isOnPC();
 
         bool isDebugMode();
         void setDebugMode(bool active);
+
+        bool isAutonomyActive();
+        void setAutonomyActive(bool active);
 
         robot_msgs::MotorFeedback publishMotors();
 };

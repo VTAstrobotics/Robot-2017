@@ -147,6 +147,11 @@ void RobotExec::killMotors()
     Bucket.set_Speed(0);
 }
 
+bool RobotExec::isOnPC()
+{
+    return onPC;
+}
+
 bool RobotExec::isAutonomyActive()
 {
     return autonomyActive;

@@ -36,7 +36,7 @@ void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)
     message << " (" << +cmd.x_r_thumb << " " << +cmd.y_r_thumb << ")";
     message << " (" << +cmd.l_trig << " " << +cmd.r_trig << ")";
 
-    ROS_INFO_STREAM(message.str());
+    ROS_DEBUG_STREAM_COND(this->isDebugMode(),message.str());
 
 
     //if autonomy mode is toggled (y button is pressed)
@@ -62,7 +62,7 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
     message << "Autonomy Command recieved: " << cmd.leftRatio << " "
     << cmd.rightRatio << " " << cmd.digCmd << " " << cmd.dumpCmd;;
 
-    ROS_INFO_STREAM(message.str());
+    ROS_DEBUG_STREAM_COND(this->isDebugMode(),message.str());
 
     if(this->autonomyActive)
     {
@@ -120,26 +120,26 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     if(cmd.l_trig > 0.0f)
     {
         //TODO: dumping mechanism commands
-        ROS_INFO_STREAM("ENTERED DUMPING STATE");
+        ROS_DEBUG_STREAM_COND(this->isDebugMode(), "ENTERED DUMPING STATE");
     }
 
     if(cmd.r_trig > 0.0f)
     {
         //TODO: dig commands
-        ROS_INFO_STREAM("ENTERED DIG STATE");
+        ROS_DEBUG_STREAM_COND(this->isDebugMode(), "ENTERED DIG STATE");
     }
 }
 
 void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
 {
-    ROS_INFO_STREAM("EXECUTING AUTONOMY CMDS");
+    ROS_DEBUG_STREAM_COND(this->isDebugMode(), "EXECUTING AUTONOMY CMDS");
     LeftDrive.set_Speed(cmd.leftRatio);
     RightDrive.set_Speed(cmd.rightRatio);
 }
 
 void RobotExec::killMotors()
 {
-    ROS_INFO_STREAM("KILL MOTORS");
+    ROS_DEBUG_STREAM_COND(this->isDebugMode(), "KILL MOTORS");
     LeftDrive.set_Speed(0);
     RightDrive.set_Speed(0);
     Lift.set_Speed(0);
@@ -179,7 +179,7 @@ robot_msgs::MotorFeedback RobotExec::publishMotors()
     //get RPM methods will be implemented here
     //for now, send dummy values
 
-    ROS_INFO_STREAM("GETTING MOTOR DATA");
+    ROS_DEBUG_STREAM_COND(this->isDebugMode(), "GETTING MOTOR DATA");
 
     //testing random dummy values
     fb.drumRPM = 1000;

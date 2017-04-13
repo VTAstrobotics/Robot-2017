@@ -79,7 +79,7 @@ int main(int argc, char **argv)
             std::stringstream msg;
             msg << motorFb.drumRPM << " " << motorFb.liftPos << " " << motorFb.leftTreadRPM
             << " " << motorFb.rightTreadRPM;
-            ROS_INFO_STREAM(msg.str());
+            ROS_DEBUG_STREAM_COND(exec.isDebugMode(), msg.str());
             pub_fb.publish(motorFb);
         }
 

@@ -15,8 +15,10 @@ class RobotExec
 {
     private:
         bool dead;
-        bool autonomyActive;
+        bool onPC;
         bool debug;
+        bool autonomyActive;
+
         float leftRatio;
         float rightRatio;
         BLDC LeftDrive;
@@ -26,7 +28,7 @@ class RobotExec
         BLDC Bucket;
 
     public:
-        RobotExec(); //constructor
+        RobotExec(bool onPC, bool debug, bool autoActive); //constructor
 
         void teleopReceived(const robot_msgs::Teleop& cmd);
         void autonomyReceived(const robot_msgs::Autonomy& cmd);

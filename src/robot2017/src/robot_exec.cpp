@@ -6,15 +6,18 @@
 #include <std_msgs/Int64.h>
 #include <string>
 
-RobotExec::RobotExec() : dead(true), autonomyActive(false), debug(false),
-                         leftRatio(0.0f), rightRatio(0.0f),
-                         LeftDrive(LEFTDRIVE, CIM), 
-                         RightDrive(RIGHTDRIVE, CIM),
-                         Lift(LIFT, Alien_4260),
-                         Storage(STORAGE, Alien_4260),
-                         Bucket(BUCKET, Alien_4260)
+RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
+    : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
+      leftRatio(0.0f), rightRatio(0.0f),
+      LeftDrive(LEFTDRIVE,   CIM), 
+      RightDrive(RIGHTDRIVE, CIM),
+      Lift(LIFT,             Alien_4260),
+      Storage(STORAGE,       Alien_4260),
+      Bucket(BUCKET,         Alien_4260)
 {
-    BLDC::init((char*) "/dev/ttyO1");
+    if(!onPC) {
+        BLDC::init((char*) "/dev/ttyO1");
+    }
 }
 
 void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)

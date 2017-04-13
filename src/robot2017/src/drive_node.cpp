@@ -10,9 +10,6 @@
 
 const int refreshRate = 1;
 
-bool onBeagleBone = true;
-bool autState = false;
-
 //Command line arguments - order doesn't matter (other than debug type must follow -debug)
 //-pc: Running test on PC instead of beaglebone
 //-debug: Hardcodes some values in order to test specific features
@@ -22,20 +19,29 @@ int main(int argc, char **argv)
 {
     // initialize the ROS system.
     ros::init(argc, argv, "drive_node");
-    RobotExec exec;
 
+    bool onPC = false;
+    bool debug = false;
+    bool autoEnable = false;
     for (int i = 0; i < argc; ++i)
     {
         if (strcmp(argv[i], "-pc") == 0)
         {
-            onBeagleBone = false;
+            onPC = true;
             ROS_WARN_STREAM("Node is not being run on a BeagleBone");
         }
         else if (strcmp(argv[i], "-debug") == 0)
         {
-            exec.setDebugMode(true);
+            debug = true;
+            ROS_WARN_STREAM("Debug mode enabled");
+        } else if(strcmp(argv[i], "-aut") == 0)
+        {
+            autoEnable = true;
+            ROS_WARN_STREAM("Starting in autonomy mode");
         }
     }
+
+    RobotExec exec(onPC, debug, autoEnable);
 
     //temporarily hardcoding this
     exec.setDebugMode(true);

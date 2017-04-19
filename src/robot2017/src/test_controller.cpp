@@ -19,6 +19,12 @@ void recievedStatus(const robot_msgs::Status& status)
 {
     ROS_DEBUG_STREAM("Recieved robot status.");
     currentStatus = status;
+    
+    std::stringstream message;
+    message << "Robot status recieved: ";
+    message << +status.robotCodeActive << " " << +status.autonomyActive
+        << " " << +status.deadmanPressed;
+    ROS_INFO_STREAM(message.str());
 }
 
 bool randomBool()
@@ -53,7 +59,7 @@ int main(int argc, char **argv)
     ros::Subscriber fbSub = nh.subscribe("/robot/autonomy/feedback", 100, &printFbCmd);
     
     heartbeat = nh.advertise<robot_msgs::Ping>("/driver/ping", 1000);
-    status = nh.subscribe("/robot/status", 1000, &recievedStatus);
+    sub_status = nh.subscribe("/robot/status", 1000, &recievedStatus);
     
     ros::Rate r(100);
     

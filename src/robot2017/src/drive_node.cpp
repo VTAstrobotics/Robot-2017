@@ -15,8 +15,6 @@ bool onBeagleBone = true;
 bool autState = false;
 bool hibernating = true;
 
-RobotExec exec;
-
 ros::Subscriber sub_tele, sub_aut, driver_ping;
 ros::Publisher pub_fb, pub_status;
 ros::Time lastDriverPing;
@@ -28,7 +26,7 @@ robot_msgs::Status status;
 //-aut: Tests autonomy - hardcodes autonomyActive to 1 (true), does not subscribe to teleop messages
 //TODO: any other specific states we want to test?
 
-void publishStatus(const ros::TimerEvent& event)
+void publishStatus()
 {
     ROS_DEBUG_STREAM("Publishing status message.");
     pub_status.publish(status);
@@ -36,7 +34,7 @@ void publishStatus(const ros::TimerEvent& event)
 
 void recievedPing(const robot_msgs::Ping& ping)
 {
-    ROS_INFO_STREAM("Driver ping recieved.");
+    ROS_DEBUG_STREAM("Driver ping recieved.");
     lastDriverPing = ros::Time::now();
 }
 
@@ -45,7 +43,8 @@ int main(int argc, char **argv)
     // initialize the ROS system.
     ros::init(argc, argv, "drive_node");
     ros::NodeHandle nh;
-    lastDriverPing = ros::Time::now();
+    lastDriverPing = ros::Time::now() - ros::Duration(100);
+    ROS_ERROR_STREAM("Disconnected from driver station");
 
     // argument processing
     bool onPC = false;
@@ -68,6 +67,10 @@ int main(int argc, char **argv)
             ROS_WARN_STREAM("Starting in autonomy mode");
         }
     }
+    
+    status.robotCodeActive = true;
+    status.autonomyActive = autoEnable;
+    status.deadmanPressed = false;
 
     RobotExec exec(onPC, debug, autoEnable);
 
@@ -75,8 +78,7 @@ int main(int argc, char **argv)
 
     pub_status = nh.advertise<robot_msgs::Status>("/robot/status", 100);
     driver_ping = nh.subscribe("/driver/ping", 1000, &recievedPing);
-    
-    ros::Timer timer = nh.createTimer(ros::Duration(1/statusRate), publishStatus);
+    ros::Publisher fake_ping = nh.advertise<robot_msgs::Ping>("/driver/ping", 100);
     
     robot_msgs::MotorFeedback motorFb;
 
@@ -85,7 +87,7 @@ int main(int argc, char **argv)
     int hertz;
     if (exec.isDebugMode()) // FIXME we probably don't want this in the future
     {
-        hertz = 1; //slow rate when in debug mode
+        hertz = 10; //slow rate when in debug mode
     }
     else
     {
@@ -101,15 +103,17 @@ int main(int argc, char **argv)
         if (timeSince > 2 && !hibernating)
         {
             hibernating = true;
-            ROS_ERROR_STREAM("Disconnected from driver station.");
+            ROS_ERROR_STREAM("Disconnected from driver station");
             exec.killMotors();
         }
-        else if (timeSince <= 2)
+        else if (timeSince <= 2 && hibernating)
         {
+            ROS_INFO_STREAM("Established connection with driver station");
             hibernating = false;
         }
         if (!hibernating && exec.isAutonomyActive())
         {
+            ROS_DEBUG_STREAM("Executing motor commands");
             motorFb = exec.publishMotors();
             std::stringstream msg;
             msg << motorFb.drumRPM << " " << motorFb.liftPos << " " << motorFb.leftTreadRPM
@@ -117,6 +121,7 @@ int main(int argc, char **argv)
             ROS_DEBUG_STREAM_COND(exec.isDebugMode(), msg.str());
             pub_fb.publish(motorFb);
         }
+        publishStatus();
         r.sleep();
     }
     return 0;

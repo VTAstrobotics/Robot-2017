@@ -80,7 +80,7 @@ void MotorsReceive::update() {
                 read_mode = RequestMotor1; // make state-machine circular
             }
             break;
-            
+
         default:
             break;
     }

@@ -1,0 +1,4 @@
+<launch>
+    <node name="test_controller" pkg="robot2017" type="test_controller" output="screen">
+    </node>
+</launch>

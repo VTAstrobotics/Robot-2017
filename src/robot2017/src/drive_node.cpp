@@ -7,19 +7,20 @@
 #include "robot_msgs/Teleop.h"
 #include "robot_msgs/Autonomy.h"
 #include "robot_msgs/Ping.h"
+#include "robot_msgs/Status.h"
 #include "robot_exec.h"
 
-const int refreshRate = 1;
-const double pingRate = 4; // hertz
+const uint8_t statusRate = 1; // hertz
 bool onBeagleBone = true;
 bool autState = false;
-// 0 - connected, 1 - disconnected, 2 - pending response
-int connection = 0;
+bool hibernating = true;
 
 RobotExec exec;
 
-ros::Subscriber sub_tele, sub_aut, ping_in;
-ros::Publisher pub_fb, ping_out;
+ros::Subscriber sub_tele, sub_aut, driver_ping;
+ros::Publisher pub_fb, pub_status;
+ros::Time lastDriverPing;
+robot_msgs::Status status;
 
 //Command line arguments - order doesn't matter (other than debug type must follow -debug)
 //-pc: Running test on PC instead of beaglebone
@@ -27,23 +28,16 @@ ros::Publisher pub_fb, ping_out;
 //-aut: Tests autonomy - hardcodes autonomyActive to 1 (true), does not subscribe to teleop messages
 //TODO: any other specific states we want to test?
 
-void publishPing(const ros::TimerEvent& event)
+void publishStatus(const ros::TimerEvent& event)
 {
-    ROS_DEBUG_STREAM("Pinging driver station.");
-    robot_msgs::Ping msg;
-    msg.data = 0;
-    ping_out.publish(msg);
-    connection = 2;
+    ROS_DEBUG_STREAM("Publishing status message.");
+    pub_status.publish(status);
 }
 
 void recievedPing(const robot_msgs::Ping& ping)
 {
-    if (ping.data == 1)
-    {
-        ROS_DEBUG_STREAM("Confirmed connection with driver station.");
-        connection = 0;
-    }
-    else connection = 1;
+    ROS_INFO_STREAM("Driver ping recieved.");
+    lastDriverPing = ros::Time::now();
 }
 
 int main(int argc, char **argv)
@@ -51,6 +45,7 @@ int main(int argc, char **argv)
     // initialize the ROS system.
     ros::init(argc, argv, "drive_node");
     ros::NodeHandle nh;
+    lastDriverPing = ros::Time::now();
 
     for (int i = 0; i < argc; ++i)
     {
@@ -66,7 +61,7 @@ int main(int argc, char **argv)
     }
 
     //temporarily hardcoding this
-    exec.setDebugMode(true);
+    exec.setDebugMode(false);
     exec.setAutonomyActive(true);
     
     sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
@@ -74,10 +69,10 @@ int main(int argc, char **argv)
 
     pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/autonomy/feedback", 100);
 
-    ping_out = nh.advertise<robot_msgs::Ping>("/robot/ping", 100);
-    ping_in = nh.subscribe("/robot/ping", 1000, &recievedPing);
+    pub_status = nh.advertise<robot_msgs::Status>("/robot/status", 100);
+    driver_ping = nh.subscribe("/driver/ping", 1000, &recievedPing);
     
-    ros::Timer timer = nh.createTimer(ros::Duration(1/pingRate), publishPing);
+    ros::Timer timer = nh.createTimer(ros::Duration(1/statusRate), publishStatus);
     
     robot_msgs::MotorFeedback motorFb;
 
@@ -98,15 +93,18 @@ int main(int argc, char **argv)
     while(ros::ok())
     {
         ros::spinOnce();
-        
-        ROS_WARN_STREAM(connection);
-        if (connection == 1)
+        double timeSince = (ros::Time::now() - lastDriverPing).toSec();
+        if (timeSince > 2 && !hibernating)
         {
-            ROS_WARN_STREAM("DISCONNECTED FROM CONTROLLER.");
+            hibernating = true;
+            ROS_ERROR_STREAM("Disconnected from driver station.");
             exec.killMotors();
-            ros::Duration(5).sleep();
         }
-        else if (exec.isAutonomyActive())
+        else if (timeSince <= 2)
+        {
+            hibernating = false;
+        }
+        if (!hibernating && exec.isAutonomyActive())
         {
             motorFb = exec.publishMotors();
             std::stringstream msg;
@@ -115,10 +113,7 @@ int main(int argc, char **argv)
             // ROS_INFO_STREAM(msg.str());
             pub_fb.publish(motorFb);
         }
-        
         r.sleep();
     }
-
     return 0;
-
 }

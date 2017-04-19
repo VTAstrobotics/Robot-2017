@@ -47,25 +47,29 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     lastDriverPing = ros::Time::now();
 
+    // argument processing
+    bool onPC = false;
+    bool debug = false;
+    bool autoEnable = false;
     for (int i = 0; i < argc; ++i)
     {
         if (strcmp(argv[i], "-pc") == 0)
         {
-            onBeagleBone = false;
+            onPC = true;
             ROS_WARN_STREAM("Node is not being run on a BeagleBone");
         }
         else if (strcmp(argv[i], "-debug") == 0)
         {
-            exec.setDebugMode(true);
+            debug = true;
+            ROS_WARN_STREAM("Debug mode enabled");
+        } else if(strcmp(argv[i], "-aut") == 0)
+        {
+            autoEnable = true;
+            ROS_WARN_STREAM("Starting in autonomy mode");
         }
     }
 
-    //temporarily hardcoding this
-    exec.setDebugMode(false);
-    exec.setAutonomyActive(true);
-    
-    sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
-    sub_aut = nh.subscribe("/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);
+    RobotExec exec(onPC, debug, autoEnable);
 
     pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/autonomy/feedback", 100);
 
@@ -79,7 +83,7 @@ int main(int argc, char **argv)
     ROS_INFO("Astrobotics 2017 ready");
     
     int hertz;
-    if (exec.isDebugMode())
+    if (exec.isDebugMode()) // FIXME we probably don't want this in the future
     {
         hertz = 1; //slow rate when in debug mode
     }
@@ -110,7 +114,7 @@ int main(int argc, char **argv)
             std::stringstream msg;
             msg << motorFb.drumRPM << " " << motorFb.liftPos << " " << motorFb.leftTreadRPM
             << " " << motorFb.rightTreadRPM;
-            // ROS_INFO_STREAM(msg.str());
+            ROS_DEBUG_STREAM_COND(exec.isDebugMode(), msg.str());
             pub_fb.publish(motorFb);
         }
         r.sleep();

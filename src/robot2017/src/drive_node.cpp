@@ -7,6 +7,7 @@
 #include "robot_msgs/Teleop.h"
 #include "robot_msgs/Autonomy.h"
 #include "robot_exec.h"
+#include "motor_receive.h"
 
 const int refreshRate = 1;
 
@@ -43,6 +44,7 @@ int main(int argc, char **argv)
     }
 
     RobotExec exec(onPC, debug, autoEnable);
+    MotorsReceive motors_update(exec);
 
     // establish this program as an ROS node.
     ros::NodeHandle nh;
@@ -72,7 +74,7 @@ int main(int argc, char **argv)
     while(ros::ok())
     {
         ros::spinOnce();
-        
+
         if (exec.isAutonomyActive())
         {
             motorFb = exec.publishMotors();
@@ -83,9 +85,9 @@ int main(int argc, char **argv)
             pub_fb.publish(motorFb);
         }
 
+        motors_update.update();
         r.sleep();
     }
 
     return 0;
-
 }

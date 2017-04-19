@@ -25,7 +25,7 @@ include_directories(
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
-add_executable(drive_node src/drive_node.cpp src/robot_exec.cpp)
+add_executable(drive_node src/drive_node.cpp src/robot_exec.cpp src/motor_receive.cpp)
 add_executable(test_controller src/test_controller.cpp)
 
 add_dependencies(drive_node robot_msgs_generate_messages_cpp)

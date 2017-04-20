@@ -3,7 +3,7 @@
 
 #include <ros/ros.h>
 #include <std_msgs/Int64.h>
-#include <std_msgs/Int8.h>
+#include <std_msgs/Bool.h>
 #include <string>
 #include "robot_msgs/Teleop.h"
 #include "robot_msgs/Autonomy.h"
@@ -32,7 +32,7 @@ void publishStatus()
     pub_status.publish(status);
 }
 
-void recievedPing(const std_msgs::Int8& ping)
+void recievedPing(const std_msgs::Bool& ping)
 {
     ROS_DEBUG_STREAM("Driver ping recieved.");
     lastDriverPing = ros::Time::now();
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 
     pub_status = nh.advertise<robot_msgs::Status>("/robot/status", 100);
     driver_ping = nh.subscribe("/driver/ping", 1000, &recievedPing);
-    ros::Publisher fake_ping = nh.advertise<std_msgs::Int8>("/driver/ping", 100);
+    ros::Publisher fake_ping = nh.advertise<std_msgs::Bool>("/driver/ping", 100);
     
     robot_msgs::MotorFeedback motorFb;
 

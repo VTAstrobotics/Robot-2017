@@ -44,7 +44,6 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "drive_node");
     ros::NodeHandle nh;
     lastDriverPing = ros::Time::now() - ros::Duration(100);
-    ROS_ERROR_STREAM("Disconnected from driver station");
 
     // argument processing
     bool onPC = false;
@@ -83,6 +82,7 @@ int main(int argc, char **argv)
     robot_msgs::MotorFeedback motorFb;
 
     ROS_INFO("Astrobotics 2017 ready");
+    ROS_INFO_STREAM("Awaiting connection to driver station...");
     
     int hertz;
     if (exec.isDebugMode()) // FIXME we probably don't want this in the future

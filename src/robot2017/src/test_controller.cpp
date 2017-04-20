@@ -6,8 +6,8 @@
 #include <robot_msgs/Teleop.h>
 #include <robot_msgs/Autonomy.h>
 #include <robot_msgs/MotorFeedback.h>
-#include <robot_msgs/Ping.h>
 #include <robot_msgs/Status.h>
+#include <std_msgs/Int8.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
     //subscribe to MotorFeedback topic
     ros::Subscriber fbSub = nh.subscribe("/robot/autonomy/feedback", 100, &printFbCmd);
     
-    heartbeat = nh.advertise<robot_msgs::Ping>("/driver/ping", 1000);
+    heartbeat = nh.advertise<std_msgs::Int8>("/driver/ping", 1000);
     sub_status = nh.subscribe("/robot/status", 1000, &recievedStatus);
     
     ros::Rate r(100);
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
         ros::spinOnce();
         r.sleep();
         
-        robot_msgs::Ping ping;
+        std_msgs::Int8 ping;
         heartbeat.publish(ping);
 
         // publish a teleop command message

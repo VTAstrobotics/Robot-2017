@@ -1,5 +1,0 @@
-<launch>
-	<include file="robot.launch" />
-	<include file="driver.launch" />
-</launch>
-

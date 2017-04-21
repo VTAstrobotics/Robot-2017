@@ -4,6 +4,3 @@
 [submodule "src/vesc_bbb_uart/src/vesc_bbb_uart"]
 	path = src/vesc_bbb_uart/src/vesc_bbb_uart
 	url = https://github.com/VTAstrobotics/VESC_BBB_UART.git
-[submodule "src/rosserial"]
-	path = src/rosserial
-	url = https://github.com/ros-drivers/rosserial.git

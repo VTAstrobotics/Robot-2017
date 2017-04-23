@@ -10,9 +10,6 @@
 
 const int refreshRate = 1;
 
-bool onBeagleBone = true;
-bool autState = false;
-
 //Command line arguments - order doesn't matter (other than debug type must follow -debug)
 //-pc: Running test on PC instead of beaglebone
 //-debug: Hardcodes some values in order to test specific features
@@ -22,24 +19,30 @@ int main(int argc, char **argv)
 {
     // initialize the ROS system.
     ros::init(argc, argv, "drive_node");
-    RobotExec exec;
 
+    // argument processing
+    bool onPC = false;
+    bool debug = false;
+    bool autoEnable = false;
     for (int i = 0; i < argc; ++i)
     {
         if (strcmp(argv[i], "-pc") == 0)
         {
-            onBeagleBone = false;
+            onPC = true;
             ROS_WARN_STREAM("Node is not being run on a BeagleBone");
         }
         else if (strcmp(argv[i], "-debug") == 0)
         {
-            exec.setDebugMode(true);
+            debug = true;
+            ROS_WARN_STREAM("Debug mode enabled");
+        } else if(strcmp(argv[i], "-aut") == 0)
+        {
+            autoEnable = true;
+            ROS_WARN_STREAM("Starting in autonomy mode");
         }
     }
 
-    //temporarily hardcoding this
-    exec.setDebugMode(true);
-    exec.setAutonomyActive(true);
+    RobotExec exec(onPC, debug, autoEnable);
 
     // establish this program as an ROS node.
     ros::NodeHandle nh;
@@ -55,7 +58,7 @@ int main(int argc, char **argv)
     ROS_INFO("Astrobotics 2017 ready");
     
     int hertz;
-    if (exec.isDebugMode())
+    if (exec.isDebugMode()) // FIXME we probably don't want this in the future
     {
         hertz = 1; //slow rate when in debug mode
     }
@@ -76,7 +79,7 @@ int main(int argc, char **argv)
             std::stringstream msg;
             msg << motorFb.drumRPM << " " << motorFb.liftPos << " " << motorFb.leftTreadRPM
             << " " << motorFb.rightTreadRPM;
-            ROS_INFO_STREAM(msg.str());
+            ROS_DEBUG_STREAM_COND(exec.isDebugMode(), msg.str());
             pub_fb.publish(motorFb);
         }
 

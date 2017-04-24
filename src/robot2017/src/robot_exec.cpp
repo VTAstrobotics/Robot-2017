@@ -185,7 +185,7 @@ robot_msgs::MotorFeedback RobotExec::publishMotors()
     ROS_DEBUG_STREAM_COND(this->isDebugMode(), "GETTING MOTOR DATA");
 
     fb.drumRPM = bucket_Data.rpm;
-    fb.liftPos = lift_Data.rpm; //do we want rpm or pos???
+    fb.liftPos = 0; //apparently lift will be done outside of bldc framework in near future
     fb.leftTreadRPM = left_Data.rpm;
     fb.rightTreadRPM = right_Data.rpm;
 

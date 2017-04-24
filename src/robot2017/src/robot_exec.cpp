@@ -177,15 +177,17 @@ robot_msgs::MotorFeedback RobotExec::publishMotors()
     robot_msgs::MotorFeedback fb;
 
     //get RPM methods will be implemented here
-    //for now, send dummy values
+    RxData left_Data = LeftDrive.get_Values();
+    RxData right_Data = RightDrive.get_Values();
+    RxData lift_Data = Lift.get_Values();
+    RxData bucket_Data = Bucket.get_Values();
 
     ROS_DEBUG_STREAM_COND(this->isDebugMode(), "GETTING MOTOR DATA");
 
-    //testing random dummy values
-    fb.drumRPM = 1000;
-    fb.liftPos = 77.77;
-    fb.leftTreadRPM = 0;
-    fb.rightTreadRPM = 16.101;
+    fb.drumRPM = bucket_Data.rpm;
+    fb.liftPos = lift_Data.rpm; //do we want rpm or pos???
+    fb.leftTreadRPM = left_Data.rpm;
+    fb.rightTreadRPM = right_Data.rpm;
 
     return fb;
 }

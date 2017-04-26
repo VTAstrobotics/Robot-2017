@@ -23,21 +23,21 @@ RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
 void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)
 {
     //if debugging, ignore teleop cmds
-    if (this->debug)
+    if (this->debug) {
+        std::stringstream message;
+
+        message << "Teleop Command recieved: ";
+        message << " " << +cmd.a << " " << +cmd.b << " " << +cmd.x << " " << +cmd.y;
+        message << " " << +cmd.lb << " " << +cmd.rb << " " << +cmd.back;
+        message << " " << +cmd.start << " " << +cmd.l_thumb << " " << +cmd.r_thumb;
+        message << " (" << +cmd.x_l_thumb << " " << +cmd.y_l_thumb << ")";
+        message << " (" << +cmd.x_r_thumb << " " << +cmd.y_r_thumb << ")";
+        message << " (" << +cmd.l_trig << " " << +cmd.r_trig << ")";
+
+        ROS_DEBUG_STREAM(message.str());
+
         return;
-
-    std::stringstream message;
-
-    message << "Teleop Command recieved: ";
-    message << " " << +cmd.a << " " << +cmd.b << " " << +cmd.x << " " << +cmd.y;
-    message << " " << +cmd.lb << " " << +cmd.rb << " " << +cmd.back;
-    message << " " << +cmd.start << " " << +cmd.l_thumb << " " << +cmd.r_thumb;
-    message << " (" << +cmd.x_l_thumb << " " << +cmd.y_l_thumb << ")";
-    message << " (" << +cmd.x_r_thumb << " " << +cmd.y_r_thumb << ")";
-    message << " (" << +cmd.l_trig << " " << +cmd.r_trig << ")";
-
-    ROS_DEBUG_STREAM_COND(this->isDebugMode(),message.str());
-
+    }
 
     //if autonomy mode is toggled (y button is pressed)
     if (cmd.y == 1)

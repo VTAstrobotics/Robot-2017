@@ -9,8 +9,8 @@
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
     : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
       leftRatio(0.0f), rightRatio(0.0f),
-      LeftDrive(LEFTDRIVE,   CIM), 
-      RightDrive(RIGHTDRIVE, CIM),
+      LeftDrive(LEFTDRIVE,   Alien_4260),
+      RightDrive(RIGHTDRIVE, Alien_4260),
       Lift(LIFT,             Alien_4260),
       Storage(STORAGE,       Alien_4260),
       Bucket(BUCKET,         Alien_4260)

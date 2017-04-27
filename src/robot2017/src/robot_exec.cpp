@@ -108,8 +108,9 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
         }
     }
 
-    LeftDrive.set_Speed(leftRatio);
-    RightDrive.set_Speed(rightRatio);
+    // TODO decide if we need set_Speed (rpm) or set_Current (amps)
+    LeftDrive.set_Current(leftRatio);
+    RightDrive.set_Current(rightRatio);
     std::stringstream msg;
     msg << "Left Ratio " << leftRatio << ", Right Ratio " << rightRatio;
     ROS_INFO_STREAM(msg.str());

@@ -5,12 +5,13 @@ find_package(catkin REQUIRED COMPONENTS
   vesc_bbb_uart
   roscpp
   robot_msgs
+  rosconsole
 )
 
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES drivetest
-  CATKIN_DEPENDS vesc_bbb_uart roscpp robot_msgs
+  CATKIN_DEPENDS vesc_bbb_uart roscpp robot_msgs rosconsole
 #  DEPENDS system_lib
 )
 

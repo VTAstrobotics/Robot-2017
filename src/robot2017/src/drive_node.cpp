@@ -82,23 +82,15 @@ int main(int argc, char **argv)
     robot_msgs::MotorFeedback motorFb;
 
     ROS_INFO("Astrobotics 2017 ready");
-    ROS_INFO_STREAM("Awaiting connection to driver station...");
+    ROS_INFO("Awaiting connection to driver station...");
     
-    int hertz;
-    if (exec.isDebugMode()) // FIXME we probably don't want this in the future
-    {
-        hertz = 10; //slow rate when in debug mode
-    }
-    else
-    {
-        hertz = 100; //100 Hz/10 ms (is this the freq. we want?)
-    }
-
+    int hertz = 100;
     ros::Rate r(hertz);
 
     while(ros::ok())
     {
         ros::spinOnce();
+
         double timeSince = (ros::Time::now() - lastDriverPing).toSec();
         if (timeSince > 2 && !hibernating)
         {
@@ -111,6 +103,7 @@ int main(int argc, char **argv)
             ROS_INFO_STREAM("Established connection with driver station");
             hibernating = false;
         }
+
         if (!hibernating && exec.isAutonomyActive())
         {
             ROS_DEBUG_STREAM("Executing motor commands");
@@ -121,6 +114,7 @@ int main(int argc, char **argv)
             ROS_DEBUG_STREAM_COND(exec.isDebugMode(), msg.str());
             pub_fb.publish(motorFb);
         }
+
         publishStatus();
         r.sleep();
     }

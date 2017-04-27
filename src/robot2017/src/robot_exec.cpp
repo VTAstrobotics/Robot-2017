@@ -6,6 +6,9 @@
 #include <std_msgs/Int64.h>
 #include <string>
 
+const char* motorPath = "/dev/tty01";  // Connected via UART
+// const char* motorPath = "/dev/ttyUSB0" // Connected via USB
+
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
     : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
       leftRatio(0.0f), rightRatio(0.0f),
@@ -16,7 +19,7 @@ RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
       Bucket(BUCKET,         Alien_4260)
 {
     if(!onPC) {
-        BLDC::init((char*) "/dev/ttyO1");
+        BLDC::init((char*) motorPath);
     }
 }
 

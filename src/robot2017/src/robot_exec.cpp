@@ -35,8 +35,6 @@ void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)
         message << " (" << +cmd.l_trig << " " << +cmd.r_trig << ")";
 
         ROS_DEBUG_STREAM(message.str());
-
-        return;
     }
 
     //if autonomy mode is toggled (y button is pressed)
@@ -75,45 +73,56 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 {
     dead = !cmd.lb;
     //write LED??? (did this last year)
+    ROS_DEBUG_STREAM("Robot dead: " << dead);
     if(dead)
     {
         killMotors();
         return;
     }
 
-    if(cmd.y_l_thumb > 0)
+    // Note: y axis is given as negative = up, positive = down
+    //       x axis also needs to be reversed when going backwards
+    if(cmd.y_l_thumb == 0)
+    {
+        // special case for spins
+        rightRatio = -cmd.x_r_thumb;
+        leftRatio  =  cmd.x_r_thumb;
+    }
+    else if(cmd.y_l_thumb < 0)
     {
         if(cmd.x_r_thumb > 0)
         {
-            leftRatio = cmd.y_l_thumb - cmd.x_r_thumb;
-            rightRatio = fmax(cmd.y_l_thumb, cmd.x_r_thumb);
+            rightRatio = -cmd.y_l_thumb - cmd.x_r_thumb;
+            leftRatio = fmax(-cmd.y_l_thumb, cmd.x_r_thumb);
         }
         else
         {
-            leftRatio = fmax(cmd.y_l_thumb, -cmd.x_r_thumb);
-            rightRatio = cmd.y_l_thumb + cmd.x_r_thumb;
+            rightRatio = fmax(-cmd.y_l_thumb, -cmd.x_r_thumb);
+            leftRatio = -cmd.y_l_thumb + cmd.x_r_thumb;
         }
     }
     else
     {
-        if(cmd.x_r_thumb > 0)
+        if(cmd.x_r_thumb < 0)
         {
-            leftRatio = -fmax(cmd.y_l_thumb, cmd.x_r_thumb);
-            rightRatio = cmd.y_l_thumb +cmd.x_r_thumb;
+            rightRatio = -fmax(-cmd.y_l_thumb, -cmd.x_r_thumb);
+            leftRatio = -cmd.y_l_thumb - cmd.x_r_thumb;
         }
         else
         {
-            leftRatio = cmd.y_l_thumb - cmd.x_r_thumb;
-            rightRatio = -fmax(-cmd.y_l_thumb, -cmd.x_r_thumb);
+            rightRatio = -cmd.y_l_thumb + cmd.x_r_thumb;
+            leftRatio = -fmax(cmd.y_l_thumb, cmd.x_r_thumb);
         }
     }
 
     // TODO decide if we need set_Speed (rpm) or set_Current (amps)
-    LeftDrive.set_Current(leftRatio);
-    RightDrive.set_Current(rightRatio);
+    if(!this->onPC) {
+        LeftDrive.set_Current(leftRatio);
+        RightDrive.set_Current(rightRatio);
+    }
     std::stringstream msg;
     msg << "Left Ratio " << leftRatio << ", Right Ratio " << rightRatio;
-    ROS_INFO_STREAM(msg.str());
+    ROS_DEBUG_STREAM(msg.str());
 
     if(fabs(leftRatio) > 0.1 || fabs(rightRatio))
         return;

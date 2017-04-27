@@ -118,10 +118,10 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
         }
     }
 
-    // TODO decide if we need set_Speed (rpm) or set_Current (amps)
+    // TODO decide if we need set_Speed (rpm) or set_Current (amps) or set_Duty (percent of input voltage)
     if(!this->onPC) {
-        LeftDrive.set_Current(leftRatio);
-        RightDrive.set_Current(rightRatio);
+        LeftDrive.set_Duty(leftRatio);
+        RightDrive.set_Duty(rightRatio);
     }
     std::stringstream msg;
     msg << "Left Ratio " << leftRatio << ", Right Ratio " << rightRatio;

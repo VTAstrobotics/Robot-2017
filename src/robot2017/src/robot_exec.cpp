@@ -185,6 +185,16 @@ void RobotExec::setDebugMode(bool active)
     debug = active;
 }
 
+// Needs to be called frequently, <1s apart
+void RobotExec::motorHeartbeat()
+{
+    LeftDrive.send_Alive();
+    RightDrive.send_Alive();
+    Lift.send_Alive();
+    Storage.send_Alive();
+    Bucket.send_Alive();
+}
+
 robot_msgs::MotorFeedback RobotExec::publishMotors()
 {
     robot_msgs::MotorFeedback fb;

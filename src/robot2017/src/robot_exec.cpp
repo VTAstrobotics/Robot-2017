@@ -162,6 +162,10 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
         ROS_DEBUG_STREAM_COND(this->isDebugMode(), "ENTERED DIG STATE");
         Bucket.set_Duty(cmd.r_trig);
     }
+    else
+    {
+        Bucket.set_Duty(0.0f);
+    }
 
     // DRUM LIFT
     // positive = down, negative = up

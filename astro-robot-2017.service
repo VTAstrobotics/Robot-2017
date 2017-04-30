@@ -1,0 +1,11 @@
+[Unit]
+Description=Astrobotics 2017 (A.R.E.S) robot code
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/bin/bash /home/astrobotics/Astro/Robot-2017/ares_launch.sh
+User=astrobotics
+
+[Install]
+WantedBy=multi-user.target

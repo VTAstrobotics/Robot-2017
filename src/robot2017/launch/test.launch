@@ -3,4 +3,8 @@
     </node>
     <node name="test_controller" pkg="robot2017" type="test_controller" output="screen">
     </node>
+    <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
+      <param name="port" value="/dev/ttyO2"/>
+      <param name="baud" value="115200"/>
+    </node>
 </launch>

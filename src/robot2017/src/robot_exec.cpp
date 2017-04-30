@@ -9,6 +9,9 @@
 const char* motorPath = "/dev/tty01";  // Connected via UART
 // const char* motorPath = "/dev/ttyUSB0" // Connected via USB
 
+const float liftSpeed    = 1.0f;
+const float storageSpeed = 1.0f;
+
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
     : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
       leftRatio(0.0f), rightRatio(0.0f),
@@ -41,7 +44,7 @@ void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)
     }
 
     //if autonomy mode is toggled (y button is pressed)
-    if (cmd.y == 1)
+    if (cmd.start == 1)
         this->autonomyActive = !(this->autonomyActive); //toggle autonomy state
     if(this->autonomyActive)
         return;
@@ -72,8 +75,17 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
     publishMotors();
 }
 
+
+// ==== CURRENT CONTROLS ====
+// Driving:  left stick Y, right stick X
+// Drum:     triggers L and R
+// Lift:     button Y (up), button A (down)
+// Storage:  button B (up), button X (down)
+// Autonomy: button Start (toggle)
+//  - autonomy toggle control is in teleopReceived
 void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 {
+    // DEADMAN
     dead = !cmd.lb;
     //write LED??? (did this last year)
     ROS_DEBUG_STREAM("Robot dead: " << dead);
@@ -83,6 +95,7 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
         return;
     }
 
+    // DRIVING
     // Note: y axis is given as negative = up, positive = down
     //       x axis also needs to be reversed when going backwards
     if(cmd.y_l_thumb == 0)
@@ -118,7 +131,6 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
         }
     }
 
-    // TODO decide if we need set_Speed (rpm) or set_Current (amps) or set_Duty (percent of input voltage)
     if(!this->onPC) {
         LeftDrive.set_Duty(leftRatio);
         RightDrive.set_Duty(rightRatio);
@@ -127,19 +139,49 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     msg << "Left Ratio " << leftRatio << ", Right Ratio " << rightRatio;
     ROS_DEBUG_STREAM(msg.str());
 
-    if(fabs(leftRatio) > 0.1 || fabs(rightRatio))
-        return;
+    // FIXME Not sure why we have these
+//     if(fabs(leftRatio) > 0.1 || fabs(rightRatio))
+//         return;
 
+    // BUCKET DRUM
     if(cmd.l_trig > 0.0f)
     {
         //TODO: dumping mechanism commands
         ROS_DEBUG_STREAM_COND(this->isDebugMode(), "ENTERED DUMPING STATE");
+        Bucket.set_Duty(cmd.l_trig);
     }
-
-    if(cmd.r_trig > 0.0f)
+    else if(cmd.r_trig > 0.0f)
     {
         //TODO: dig commands
         ROS_DEBUG_STREAM_COND(this->isDebugMode(), "ENTERED DIG STATE");
+        Bucket.set_Duty(cmd.r_trig);
+    }
+
+    // DRUM LIFT
+    if(cmd.y) {
+        Lift.set_Duty(liftSpeed);
+    }
+    else if(cmd.a)
+    {
+        Lift.set_Duty(-liftSpeed);
+    }
+    else
+    {
+        Lift.set_Duty(0.0f);
+    }
+
+    // SECONDARY STORAGE
+    if(cmd.b)
+    {
+        Storage.set_Duty(storageSpeed);
+    }
+    else if(cmd.x)
+    {
+        Storage.set_Duty(storageSpeed);
+    }
+    else
+    {
+        Storage.set_Duty(0.0f);
     }
 }
 

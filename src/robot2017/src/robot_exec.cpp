@@ -6,17 +6,23 @@
 #include <std_msgs/Int64.h>
 #include <string>
 
+const char* motorPath = "/dev/ttyO1";  // Connected via UART
+// const char* motorPath = "/dev/ttyUSB0" // Connected via USB
+
+const float liftSpeed    = 4000; // RPM
+const float storageSpeed = 8000; // RPM
+
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
     : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
       leftRatio(0.0f), rightRatio(0.0f),
-      LeftDrive(LEFTDRIVE,   CIM), 
-      RightDrive(RIGHTDRIVE, CIM),
+      LeftDrive(LEFTDRIVE,   Alien_4260),
+      RightDrive(RIGHTDRIVE, Alien_4260),
       Lift(LIFT,             Alien_4260),
       Storage(STORAGE,       Alien_4260),
       Bucket(BUCKET,         Alien_4260)
 {
     if(!onPC) {
-        BLDC::init((char*) "/dev/ttyO1");
+        BLDC::init((char*) motorPath);
     }
 }
 
@@ -35,12 +41,10 @@ void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)
         message << " (" << +cmd.l_trig << " " << +cmd.r_trig << ")";
 
         ROS_DEBUG_STREAM(message.str());
-
-        return;
     }
 
     //if autonomy mode is toggled (y button is pressed)
-    if (cmd.y == 1)
+    if (cmd.start == 1)
         this->autonomyActive = !(this->autonomyActive); //toggle autonomy state
     if(this->autonomyActive)
         return;
@@ -71,63 +75,124 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
     publishMotors();
 }
 
+
+// ==== TELEOP CONTROLS ====
+// Driving:  left stick Y, right stick X
+// Drum:     trigger L (dump), trigger R (dig)
+// Lift:     button Y (up), button A (down)
+// Storage:  button B (up), button X (down)
+// Autonomy: button Start (toggle)
+//  - autonomy toggle control is in teleopReceived
+// ==== MOTOR CONTROLS ====
+// Driving:  duty cycle (% voltage, -1.0 to 1.0)
+// Drum:     duty cycle (% voltage, -1.0 to 1.0)
+// Lift:     speed (raw RPM)
+// Storage:  speed (raw RPM)
 void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 {
+    // DEADMAN
     dead = !cmd.lb;
     //write LED??? (did this last year)
+    ROS_DEBUG_STREAM("Robot dead: " << dead);
     if(dead)
     {
         killMotors();
         return;
     }
 
-    if(cmd.y_l_thumb > 0)
+    // DRIVING
+    // Note: y axis is given as negative = up, positive = down
+    //       x axis also needs to be reversed when going backwards
+    if(cmd.y_l_thumb == 0)
+    {
+        // special case for spins
+        rightRatio = -cmd.x_r_thumb;
+        leftRatio  =  cmd.x_r_thumb;
+    }
+    else if(cmd.y_l_thumb < 0)
     {
         if(cmd.x_r_thumb > 0)
         {
-            leftRatio = cmd.y_l_thumb - cmd.x_r_thumb;
-            rightRatio = fmax(cmd.y_l_thumb, cmd.x_r_thumb);
+            rightRatio = -cmd.y_l_thumb - cmd.x_r_thumb;
+            leftRatio = fmax(-cmd.y_l_thumb, cmd.x_r_thumb);
         }
         else
         {
-            leftRatio = fmax(cmd.y_l_thumb, -cmd.x_r_thumb);
-            rightRatio = cmd.y_l_thumb + cmd.x_r_thumb;
+            rightRatio = fmax(-cmd.y_l_thumb, -cmd.x_r_thumb);
+            leftRatio = -cmd.y_l_thumb + cmd.x_r_thumb;
         }
     }
     else
     {
-        if(cmd.x_r_thumb > 0)
+        if(cmd.x_r_thumb < 0)
         {
-            leftRatio = -fmax(cmd.y_l_thumb, cmd.x_r_thumb);
-            rightRatio = cmd.y_l_thumb +cmd.x_r_thumb;
+            rightRatio = -fmax(-cmd.y_l_thumb, -cmd.x_r_thumb);
+            leftRatio = -cmd.y_l_thumb - cmd.x_r_thumb;
         }
         else
         {
-            leftRatio = cmd.y_l_thumb - cmd.x_r_thumb;
-            rightRatio = -fmax(-cmd.y_l_thumb, -cmd.x_r_thumb);
+            rightRatio = -cmd.y_l_thumb + cmd.x_r_thumb;
+            leftRatio = -fmax(cmd.y_l_thumb, cmd.x_r_thumb);
         }
     }
 
-    // TODO decide if we need set_Speed (rpm) or set_Current (amps)
-    LeftDrive.set_Current(leftRatio);
-    RightDrive.set_Current(rightRatio);
+    if(!this->onPC) {
+        LeftDrive.set_Duty(leftRatio);
+        RightDrive.set_Duty(rightRatio);
+    }
     std::stringstream msg;
     msg << "Left Ratio " << leftRatio << ", Right Ratio " << rightRatio;
-    ROS_INFO_STREAM(msg.str());
+    ROS_DEBUG_STREAM(msg.str());
 
-    if(fabs(leftRatio) > 0.1 || fabs(rightRatio))
-        return;
+    // FIXME Not sure why we have these
+//     if(fabs(leftRatio) > 0.1 || fabs(rightRatio))
+//         return;
 
+    // BUCKET DRUM
+    // positive = dig, negative = dump
     if(cmd.l_trig > 0.0f)
     {
         //TODO: dumping mechanism commands
         ROS_DEBUG_STREAM_COND(this->isDebugMode(), "ENTERED DUMPING STATE");
+        Bucket.set_Duty(-cmd.l_trig);
     }
-
-    if(cmd.r_trig > 0.0f)
+    else if(cmd.r_trig > 0.0f)
     {
         //TODO: dig commands
         ROS_DEBUG_STREAM_COND(this->isDebugMode(), "ENTERED DIG STATE");
+        Bucket.set_Duty(cmd.r_trig);
+    }
+    else
+    {
+        Bucket.set_Duty(0.0f);
+    }
+
+    // DRUM LIFT
+    // positive = down, negative = up
+    if(cmd.y) {
+        Lift.set_Speed(-liftSpeed);
+    }
+    else if(cmd.a)
+    {
+        Lift.set_Speed(liftSpeed);
+    }
+    else
+    {
+        Lift.set_Speed(0.0f);
+    }
+
+    // SECONDARY STORAGE
+    if(cmd.b)
+    {
+        Storage.set_Speed(storageSpeed);
+    }
+    else if(cmd.x)
+    {
+        Storage.set_Speed(-storageSpeed);
+    }
+    else
+    {
+        Storage.set_Speed(0.0f);
     }
 }
 
@@ -171,6 +236,16 @@ bool RobotExec::isDebugMode()
 void RobotExec::setDebugMode(bool active)
 {
     debug = active;
+}
+
+// Needs to be called frequently, <1s apart
+void RobotExec::motorHeartbeat()
+{
+    LeftDrive.send_Alive();
+    RightDrive.send_Alive();
+    Lift.send_Alive();
+    Storage.send_Alive();
+    Bucket.send_Alive();
 }
 
 robot_msgs::MotorFeedback RobotExec::publishMotors()

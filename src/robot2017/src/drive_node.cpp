@@ -2,6 +2,7 @@
 // handles robot driving, including processing teleop commands and managing autonomy
 
 #include <ros/ros.h>
+#include <ros/console.h>
 #include <std_msgs/Int64.h>
 #include <string>
 #include "robot_msgs/Teleop.h"
@@ -35,6 +36,9 @@ int main(int argc, char **argv)
         else if (strcmp(argv[i], "-debug") == 0)
         {
             debug = true;
+            if(ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
+                ros::console::notifyLoggerLevelsChanged();
+            }
             ROS_WARN_STREAM("Debug mode enabled");
         } else if(strcmp(argv[i], "-aut") == 0)
         {
@@ -65,6 +69,7 @@ int main(int argc, char **argv)
     while(ros::ok())
     {
         ros::spinOnce();
+        exec.motorHeartbeat();
 
         if (exec.isAutonomyActive())
         {

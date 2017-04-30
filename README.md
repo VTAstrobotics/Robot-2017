@@ -15,3 +15,7 @@ After building, run the following commands:
 
 1. `source devel/setup.bash` to initialize the newly-built robot code environment
 2. `roslaunch robot2017 main.launch` to launch the robot code
+
+## Running at boot
+The code can be configured to launch automatically at boot after the network is connected, on any system that supports systemd.
+See `astro-robot-2017.service` for details.

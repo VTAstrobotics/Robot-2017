@@ -1,0 +1,4 @@
+<launch>
+    <node name="drive_node" pkg="robot2017" type="drive_node" output="screen" args="-debug">
+    </node>
+</launch>

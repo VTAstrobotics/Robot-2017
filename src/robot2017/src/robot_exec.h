@@ -48,6 +48,8 @@ class RobotExec
         bool isAutonomyActive();
         void setAutonomyActive(bool active);
 
+        void motorHeartbeat();
+
         robot_msgs::MotorFeedback publishMotors();
 };
 

@@ -6,7 +6,7 @@
 #include <std_msgs/Int64.h>
 #include <string>
 
-const char* motorPath = "/dev/tty01";  // Connected via UART
+const char* motorPath = "/dev/ttyO1";  // Connected via UART
 // const char* motorPath = "/dev/ttyUSB0" // Connected via USB
 
 const float liftSpeed    = 1.0f;

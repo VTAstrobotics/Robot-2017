@@ -9,8 +9,8 @@
 const char* motorPath = "/dev/ttyO1";  // Connected via UART
 // const char* motorPath = "/dev/ttyUSB0" // Connected via USB
 
-const float liftSpeed    = 1.0f;
-const float storageSpeed = 1.0f;
+const float liftSpeed    = 4000; // RPM
+const float storageSpeed = 8000; // RPM
 
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
     : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
@@ -76,13 +76,18 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
 }
 
 
-// ==== CURRENT CONTROLS ====
+// ==== TELEOP CONTROLS ====
 // Driving:  left stick Y, right stick X
-// Drum:     triggers L and R
+// Drum:     trigger L (dump), trigger R (dig)
 // Lift:     button Y (up), button A (down)
 // Storage:  button B (up), button X (down)
 // Autonomy: button Start (toggle)
 //  - autonomy toggle control is in teleopReceived
+// ==== MOTOR CONTROLS ====
+// Driving:  duty cycle (% voltage, -1.0 to 1.0)
+// Drum:     duty cycle (% voltage, -1.0 to 1.0)
+// Lift:     speed (raw RPM)
+// Storage:  speed (raw RPM)
 void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 {
     // DEADMAN
@@ -144,11 +149,12 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 //         return;
 
     // BUCKET DRUM
+    // positive = dig, negative = dump
     if(cmd.l_trig > 0.0f)
     {
         //TODO: dumping mechanism commands
         ROS_DEBUG_STREAM_COND(this->isDebugMode(), "ENTERED DUMPING STATE");
-        Bucket.set_Duty(cmd.l_trig);
+        Bucket.set_Duty(-cmd.l_trig);
     }
     else if(cmd.r_trig > 0.0f)
     {
@@ -158,30 +164,31 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     }
 
     // DRUM LIFT
+    // positive = down, negative = up
     if(cmd.y) {
-        Lift.set_Duty(liftSpeed);
+        Lift.set_Speed(-liftSpeed);
     }
     else if(cmd.a)
     {
-        Lift.set_Duty(-liftSpeed);
+        Lift.set_Speed(liftSpeed);
     }
     else
     {
-        Lift.set_Duty(0.0f);
+        Lift.set_Speed(0.0f);
     }
 
     // SECONDARY STORAGE
     if(cmd.b)
     {
-        Storage.set_Duty(storageSpeed);
+        Storage.set_Speed(storageSpeed);
     }
     else if(cmd.x)
     {
-        Storage.set_Duty(storageSpeed);
+        Storage.set_Speed(-storageSpeed);
     }
     else
     {
-        Storage.set_Duty(0.0f);
+        Storage.set_Speed(0.0f);
     }
 }
 

@@ -16,7 +16,7 @@ void MotorsReceive::update() {
                 exec.LeftDrive.read_Data();
                 // Return values for use by application
                 //testData = exec.LeftDrive.get_Values();
-                exec.LeftDrive.print_Data();
+//                 exec.LeftDrive.print_Data();
                 read_mode = RequestMotor2;
             }
             break;
@@ -31,7 +31,7 @@ void MotorsReceive::update() {
                 exec.RightDrive.read_Data();
                 // Return values for use by application
                 //testData = exec.RightDrive.get_Values();
-                exec.RightDrive.print_Data();
+//                 exec.RightDrive.print_Data();
                 read_mode = RequestMotor3;
             }
             break;
@@ -46,7 +46,7 @@ void MotorsReceive::update() {
                 exec.Lift.read_Data();
                 // Return values for use by application
                 //testData = exec.Lift.get_Values();
-                exec.Lift.print_Data();
+//                 exec.Lift.print_Data();
                 read_mode = RequestMotor4;
             }
             break;
@@ -61,7 +61,7 @@ void MotorsReceive::update() {
                 exec.Storage.read_Data();
                 // Return values for use by application
                 //testData = exec.Storage.get_Values();
-                exec.Storage.print_Data();
+//                 exec.Storage.print_Data();
                 read_mode = RequestMotor5;
             }
             break;
@@ -76,7 +76,7 @@ void MotorsReceive::update() {
                 exec.Bucket.read_Data();
                 // Return values for use by application
                 //testData = exec.Bucket.get_Values();
-                exec.Bucket.print_Data();
+//                 exec.Bucket.print_Data();
                 read_mode = RequestMotor1; // make state-machine circular
             }
             break;

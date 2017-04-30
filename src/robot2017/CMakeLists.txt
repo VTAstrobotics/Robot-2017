@@ -3,7 +3,6 @@ project(robot2017)
 
 find_package(catkin REQUIRED COMPONENTS
   vesc_bbb_uart
-  beaglebone_pwm
   roscpp
   robot_msgs
 )
@@ -11,7 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES drivetest
-  CATKIN_DEPENDS vesc_bbb_uart beaglebone_pwm roscpp robot_msgs
+  CATKIN_DEPENDS vesc_bbb_uart roscpp robot_msgs
 #  DEPENDS system_lib
 )
 

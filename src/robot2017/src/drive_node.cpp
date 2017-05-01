@@ -11,12 +11,12 @@
 #include "robot_exec.h"
 
 const uint8_t statusRate = 1; // hertz
+const uint8_t maxPing = 2; // max secs between pings before shutdown
 bool onBeagleBone = true;
 bool autState = false;
 bool hibernating = true;
 
-ros::Subscriber sub_tele, sub_aut, driver_ping;
-ros::Publisher pub_fb, pub_status;
+ros::Publisher pub_status; // declared globally for publishStatus()
 ros::Time lastDriverPing;
 robot_msgs::Status status;
 
@@ -72,12 +72,17 @@ int main(int argc, char **argv)
     status.deadmanPressed = false;
 
     RobotExec exec(onPC, debug, autoEnable);
-
-    pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/autonomy/feedback", 100);
-
-    pub_status = nh.advertise<robot_msgs::Status>("/robot/status", 100);
-    driver_ping = nh.subscribe("/driver/ping", 1000, &recievedPing);
-    ros::Publisher fake_ping = nh.advertise<std_msgs::Bool>("/driver/ping", 100);
+    
+    pub_status = nh.advertise<robot_msgs::Status>(
+        "/robot/status", 100);
+    ros::Publisher pub_fb = nh.advertise<robot_msgs::MotorFeedback>(
+        "/robot/autonomy/feedback", 100);
+    ros::Subscriber sub_tele = nh.subscribe(
+        "/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
+    ros::Subscriber sub_aut = nh.subscribe(
+        "/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);
+    ros::Subscriber driver_ping = nh.subscribe(
+        "/driver/ping", 1000, &recievedPing);
     
     robot_msgs::MotorFeedback motorFb;
 
@@ -92,13 +97,13 @@ int main(int argc, char **argv)
         ros::spinOnce();
 
         double timeSince = (ros::Time::now() - lastDriverPing).toSec();
-        if (timeSince > 2 && !hibernating)
+        if (timeSince > maxPing && !hibernating)
         {
             hibernating = true;
             ROS_ERROR_STREAM("Disconnected from driver station");
             exec.killMotors();
         }
-        else if (timeSince <= 2 && hibernating)
+        else if (timeSince <= maxPing && hibernating)
         {
             ROS_INFO_STREAM("Established connection with driver station");
             hibernating = false;

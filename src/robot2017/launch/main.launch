@@ -8,4 +8,12 @@
         respawn_delay="10">
     </node>
 
+    <node name="drive_node"
+        pkg="robot2017"
+        type="drive_node"
+        output="screen"
+        respawn="true"
+        respawn_delay="10">
+    </node>
+
 </launch>

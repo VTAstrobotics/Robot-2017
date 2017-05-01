@@ -1,5 +1,13 @@
 <launch>
 
+    <node name="test_controller"
+        pkg="robot2017"
+        type="test_controller"
+        output="screen"
+        respawn="true"
+        respawn_delay="10">
+    </node>
+
     <node name="drive_node"
         pkg="robot2017"
         type="drive_node"
@@ -8,5 +16,5 @@
         respawn="true"
         respawn_delay="10">
     </node>
-    
+
 </launch>

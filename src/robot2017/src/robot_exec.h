@@ -21,6 +21,7 @@ class RobotExec
         bool onPC;
         bool debug;
         bool autonomyActive;
+        bool prevState;
 
         float leftRatio;
         float rightRatio;
@@ -34,6 +35,8 @@ class RobotExec
         RobotExec(bool onPC, bool debug, bool autoActive); //constructor
 
         void teleopReceived(const robot_msgs::Teleop& cmd);
+        void modeTransition(const bool buttonState);
+
         void autonomyReceived(const robot_msgs::Autonomy& cmd);
 
         void teleopExec(const robot_msgs::Teleop& cmd);

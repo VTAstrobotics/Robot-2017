@@ -13,7 +13,7 @@ const float liftSpeed    = 4000; // RPM
 const float storageSpeed = 8000; // RPM
 
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
-    : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
+    : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive), prevState(false),
       leftRatio(0.0f), rightRatio(0.0f),
       LeftDrive(LEFTDRIVE,   Alien_4260),
       RightDrive(RIGHTDRIVE, Alien_4260),
@@ -43,10 +43,10 @@ void RobotExec::teleopReceived(const robot_msgs::Teleop& cmd)
         ROS_DEBUG_STREAM(message.str());
     }
 
-    //if autonomy mode is toggled (y button is pressed)
-    if (cmd.start == 1)
-        this->autonomyActive = !(this->autonomyActive); //toggle autonomy state
-    if(this->autonomyActive)
+    //if autonomy mode is toggled (start button is pressed)
+    modeTransition(cmd.start);
+
+    if(isAutonomyActive())
         return;
     else
     {
@@ -68,13 +68,32 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
 
     ROS_DEBUG_STREAM_COND(this->isDebugMode(),message.str());
 
-    if(this->autonomyActive)
+    if(isAutonomyActive())
     {
         autonomyExec(cmd);
     }
     publishMotors();
 }
 
+//adds debouncing for start button
+//ensures that if button shows up as pressed for several messages in a row
+//it will not keep toggling the autonomy active state
+//mode will not toggle until there is at least one unpressed button in msg
+//in between two messages with button pressed
+void RobotExec::modeTransition(const bool buttonState)
+{
+    if (prevState == false && buttonState == true)
+    {
+        setAutonomyActive(!isAutonomyActive()); //toggle mode
+        prevState = true;
+    }
+    else if (prevState == true && buttonState == false)
+    {
+        prevState = false;
+    }
+    
+    //do nothing if both true or both false
+}
 
 // ==== TELEOP CONTROLS ====
 // Driving:  left stick Y, right stick X

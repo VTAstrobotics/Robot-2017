@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
     ros::Subscriber sub_aut = nh.subscribe("/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);
 
-    ros::Publisher pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/autonomy/feedback", 100);
+    ros::Publisher pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/motor/feedback", 100);
 
     robot_msgs::MotorFeedback motorFb;
 

@@ -2,11 +2,13 @@
 // handles robot driving, including processing teleop commands and managing autonomy
 
 #include <ros/ros.h>
+#include <ros/console.h>
 #include <std_msgs/Int64.h>
 #include <string>
 #include "robot_msgs/Teleop.h"
 #include "robot_msgs/Autonomy.h"
 #include "robot_exec.h"
+#include "motor_receive.h"
 
 const int refreshRate = 1;
 
@@ -34,6 +36,9 @@ int main(int argc, char **argv)
         else if (strcmp(argv[i], "-debug") == 0)
         {
             debug = true;
+            if(ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
+                ros::console::notifyLoggerLevelsChanged();
+            }
             ROS_WARN_STREAM("Debug mode enabled");
         } else if(strcmp(argv[i], "-aut") == 0)
         {
@@ -43,6 +48,7 @@ int main(int argc, char **argv)
     }
 
     RobotExec exec(onPC, debug, autoEnable);
+    MotorsReceive motors_update(exec);
 
     // establish this program as an ROS node.
     ros::NodeHandle nh;
@@ -51,7 +57,7 @@ int main(int argc, char **argv)
 
     ros::Subscriber sub_aut = nh.subscribe("/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);
 
-    ros::Publisher pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/autonomy/feedback", 100);
+    ros::Publisher pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/motor/feedback", 100);
 
     robot_msgs::MotorFeedback motorFb;
 
@@ -63,6 +69,7 @@ int main(int argc, char **argv)
     while(ros::ok())
     {
         ros::spinOnce();
+        exec.motorHeartbeat();
 
         if (exec.isAutonomyActive())
         {
@@ -74,9 +81,9 @@ int main(int argc, char **argv)
             pub_fb.publish(motorFb);
         }
 
+        motors_update.update();
         r.sleep();
     }
 
     return 0;
-
 }

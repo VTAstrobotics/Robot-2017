@@ -11,8 +11,11 @@
 #ifndef ROBOT_EXEC_H
 #define ROBOT_EXEC_H
 
+class MotorsReceive;
+
 class RobotExec
 {
+    friend MotorsReceive;
     private:
         bool dead;
         bool onPC;
@@ -44,6 +47,8 @@ class RobotExec
 
         bool isAutonomyActive();
         void setAutonomyActive(bool active);
+
+        void motorHeartbeat();
 
         robot_msgs::MotorFeedback publishMotors();
 };

@@ -24,6 +24,7 @@ add_library(${PROJECT_NAME}
   src/${PROJECT_NAME}/comm_uart.c
   src/${PROJECT_NAME}/crc.c
   src/${PROJECT_NAME}/packet.c
+  src/${PROJECT_NAME}/timers.c
 )
 
 #############

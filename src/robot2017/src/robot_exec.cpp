@@ -263,8 +263,8 @@ robot_msgs::MotorFeedback RobotExec::publishMotors()
     fb.drumRPM = bucket_Data.rpm;
     fb.leftTreadRPM = left_Data.rpm;
     fb.rightTreadRPM = right_Data.rpm;
-    
-    //items not yet implemented
+
+    // TODO items not yet implemented
     fb.liftPos = 0;
     fb.liftCurrent = 0;
     fb.drumCurrent = 0;

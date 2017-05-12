@@ -280,9 +280,21 @@ robot_msgs::MotorFeedback RobotExec::publishMotors()
     ROS_DEBUG_STREAM_COND(this->isDebugMode(), "GETTING MOTOR DATA");
 
     fb.drumRPM = bucket_Data.rpm;
-    fb.liftPos = 0; //apparently lift will be done outside of bldc framework in near future
     fb.leftTreadRPM = left_Data.rpm;
     fb.rightTreadRPM = right_Data.rpm;
+
+    // TODO items not yet implemented
+    fb.liftPos = 0;
+    fb.liftCurrent = 0;
+    fb.drumCurrent = 0;
+    fb.leftStorageWeight = 0;
+    fb.rightStorageWeight = 0;
+    fb.storagePos = 0;
+    fb.rightTreadFault = "";
+    fb.leftTreadFault = "";
+    fb.drumFault = "";
+    fb.liftFault = "";
+    fb.storageFault = "";
 
     return fb;
 }

@@ -16,7 +16,6 @@ const int refreshRate = 1;
 //-pc: Running test on PC instead of beaglebone
 //-debug: Hardcodes some values in order to test specific features
 //-aut: Tests autonomy - hardcodes autonomyActive to 1 (true), does not subscribe to teleop messages
-//TODO: any other specific states we want to test?
 int main(int argc, char **argv)
 {
     // initialize the ROS system.

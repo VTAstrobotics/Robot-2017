@@ -144,21 +144,15 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     msg << "Left Ratio " << leftRatio << ", Right Ratio " << rightRatio;
     ROS_DEBUG_STREAM(msg.str());
 
-    // FIXME Not sure why we have these
-//     if(fabs(leftRatio) > 0.1 || fabs(rightRatio))
-//         return;
-
     // BUCKET DRUM
     // positive = dig, negative = dump
     if(cmd.l_trig > 0.0f)
     {
-        //TODO: dumping mechanism commands
         ROS_DEBUG_STREAM_COND(this->isDebugMode(), "ENTERED DUMPING STATE");
         Bucket.set_Duty(-cmd.l_trig);
     }
     else if(cmd.r_trig > 0.0f)
     {
-        //TODO: dig commands
         ROS_DEBUG_STREAM_COND(this->isDebugMode(), "ENTERED DIG STATE");
         Bucket.set_Duty(cmd.r_trig);
     }
@@ -166,6 +160,8 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     {
         Bucket.set_Duty(0.0f);
     }
+
+    // FIXME Change lift motors to use set_Position for active braking, once encoders are installed
 
     // DRUM LIFT
     // positive = down, negative = up

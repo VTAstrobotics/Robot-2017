@@ -14,7 +14,7 @@ catkin_package(
 ## Build ##
 ###########
 
-include_directories(src/${PROJECT_NAME})
+include_directories(src)
 
 add_library(${PROJECT_NAME}
   src/adc.c
@@ -32,7 +32,7 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 # Mark cpp header files for installation
-install(DIRECTORY src/${PROJECT_NAME}/
+install(DIRECTORY src
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h"
 )

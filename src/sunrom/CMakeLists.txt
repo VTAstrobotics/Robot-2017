@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sunrom)
+set(REPO_DIR "Sunrom1190_Linux")
 
 find_package(catkin REQUIRED COMPONENTS)
 
 catkin_package(
-   INCLUDE_DIRS src
+   INCLUDE_DIRS src/${REPO_DIR}
    LIBRARIES ${PROJECT_NAME}
 #  CATKIN_DEPENDS
 #  DEPENDS system_lib
@@ -14,9 +15,8 @@ catkin_package(
 ## Build ##
 ###########
 
-include_directories(src/${PROJECT_NAME})
+include_directories(src/${REPO_DIR})
 
-set(REPO_DIR "Sunrom1190_Linux")
 add_library(${PROJECT_NAME}
   src/${REPO_DIR}/sunrom.cpp
 )
@@ -32,7 +32,7 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 # Mark cpp header files for installation
-install(DIRECTORY src/${PROJECT_NAME}/
+install(DIRECTORY src/${REPO_DIR}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h"
 )

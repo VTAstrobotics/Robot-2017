@@ -4,6 +4,7 @@ project(robot2017)
 find_package(catkin REQUIRED COMPONENTS
   vesc_bbb_uart
   sunrom
+  bbb_hw
   roscpp
   robot_msgs
   rosconsole

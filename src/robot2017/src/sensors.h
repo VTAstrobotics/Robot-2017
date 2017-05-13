@@ -8,13 +8,24 @@
 
 class Sensors {
 public:
+    // Ready:     code started             (blue)
+    // Active:    deadman pressed          (green)
+    // Hibernate: lost connection to drive (red)
+    enum status_led_t {READY, ACTIVE, HIBER};
+
     Sensors();
 
-private:
-    void initGpio();
-    void initLoadCells();
+    void setStatusLed(status_led_t value);
+    float getLeftStorageWeight();
+    float getRightStorageWeight();
 
-    
+private:
+    const float LOAD_CELL_SCALE = 0.38; // Default 40kg load cell scaling factor
+
+    void initGpio();
+
+    SUNROM leftLoadCell;
+    SUNROM rightLoadCell;
 };
 
 #endif

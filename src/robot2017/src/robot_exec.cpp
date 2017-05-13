@@ -23,6 +23,7 @@ RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
 {
     if(!onPC) {
         BLDC::init((char*) motorPath);
+        // TODO init GPIOs we need here
     }
 }
 

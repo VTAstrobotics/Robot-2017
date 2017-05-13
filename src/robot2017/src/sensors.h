@@ -15,7 +15,11 @@ public:
 
     Sensors();
 
+    // GPIOs
     void setStatusLed(status_led_t value);
+    bool getKillButton();
+
+    // Load cells
     float getLeftStorageWeight();
     float getRightStorageWeight();
 

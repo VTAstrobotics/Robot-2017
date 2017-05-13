@@ -67,8 +67,10 @@ int main(int argc, char **argv)
 
     while(ros::ok())
     {
+        // TODO add status led code for setting HIBER when ping disconnects
         ros::spinOnce();
         exec.motorHeartbeat();
+        exec.checkKillButton();
 
         if (exec.isAutonomyActive())
         {

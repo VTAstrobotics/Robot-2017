@@ -2,6 +2,7 @@
 //handles teleop calculations
 //calls appropriate motor functions
 
+#include "sensors.h"
 #include "robot_msgs/Teleop.h"
 #include "robot_msgs/Autonomy.h"
 #include "robot_msgs/MotorFeedback.h"
@@ -17,7 +18,7 @@ class RobotExec
 {
     friend MotorsReceive;
     private:
-        bool dead;
+        bool dead; // This indicates if the physical kill switch on the robot is pressed
         bool onPC;
         bool debug;
         bool autonomyActive;
@@ -29,6 +30,7 @@ class RobotExec
         BLDC Lift;
         BLDC Storage;
         BLDC Bucket;
+        Sensors sensors;
 
     public:
         RobotExec(bool onPC, bool debug, bool autoActive); //constructor
@@ -49,6 +51,7 @@ class RobotExec
         void setAutonomyActive(bool active);
 
         void motorHeartbeat();
+        void checkKillButton();
 
         robot_msgs::MotorFeedback publishMotors();
 };

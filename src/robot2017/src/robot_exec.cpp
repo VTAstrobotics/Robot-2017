@@ -23,7 +23,7 @@ RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
 {
     if(!onPC) {
         BLDC::init((char*) motorPath);
-        // TODO init GPIOs we need here
+        sensors.setStatusLed(Sensors::READY);
     }
 }
 
@@ -69,7 +69,8 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
 
     ROS_DEBUG_STREAM_COND(this->isDebugMode(),message.str());
 
-    if(this->autonomyActive)
+    // Make sure autonomy doesn't run if kill switch is pressed
+    if(this->autonomyActive && !dead)
     {
         autonomyExec(cmd);
     }
@@ -91,14 +92,18 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
 // Storage:  speed (raw RPM)
 void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 {
-    // DEADMAN
-    dead = !cmd.lb;
-    //write LED??? (did this last year)
+    // DEADMAN + physical kill switch
     ROS_DEBUG_STREAM("Robot dead: " << dead);
-    if(dead)
+    bool shouldKill = dead || !cmd.lb;
+    if(shouldKill)
     {
         killMotors();
+        sensors.setStatusLed(Sensors::READY);
         return;
+    }
+    else
+    {
+        sensors.setStatusLed(Sensors::ACTIVE);
     }
 
     // DRIVING
@@ -243,6 +248,16 @@ void RobotExec::motorHeartbeat()
     Lift.send_Alive();
     Storage.send_Alive();
     Bucket.send_Alive();
+}
+
+// Call frequently to check if kill button on robot is pressed
+// If pressed, will kill motors and disable teleop until released
+void RobotExec::checkKillButton() {
+    dead = sensors.getKillButton();
+    if(dead)
+    {
+        killMotors();
+    }
 }
 
 robot_msgs::MotorFeedback RobotExec::publishMotors()

@@ -4,3 +4,6 @@
 [submodule "src/vesc_bbb_uart/src/vesc_bbb_uart"]
 	path = src/vesc_bbb_uart/src/vesc_bbb_uart
 	url = https://github.com/VTAstrobotics/VESC_BBB_UART.git
+[submodule "src/sunrom/src/Sunrom1190_Linux"]
+	path = src/sunrom/src/Sunrom1190_Linux
+	url = https://github.com/owensrl/Sunrom1190_Linux.git

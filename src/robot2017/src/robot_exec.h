@@ -5,6 +5,7 @@
 #include "robot_msgs/Teleop.h"
 #include "robot_msgs/Autonomy.h"
 #include "robot_msgs/MotorFeedback.h"
+#include <std_msgs/Bool.h>
 #include <ros/ros.h>
 #include <vesc_bbb_uart/bldc.h>
 
@@ -31,6 +32,8 @@ class RobotExec
         BLDC Storage;
         BLDC Bucket;
 
+        std_msgs::Bool enable;
+
     public:
         RobotExec(bool onPC, bool debug, bool autoActive); //constructor
 
@@ -54,6 +57,7 @@ class RobotExec
         void motorHeartbeat();
 
         robot_msgs::MotorFeedback publishMotors();
+        std_msgs::Bool getEnMsg();
 };
 
 #endif

@@ -86,6 +86,8 @@ void RobotExec::modeTransition(const bool buttonState)
     {
         setAutonomyActive(!isAutonomyActive()); //toggle mode
         prevState = true;
+
+        enable.data = isAutonomyActive(); //toggle data in autonomy enable message
     }
     else if (prevState == true && buttonState == false)
     {
@@ -297,4 +299,9 @@ robot_msgs::MotorFeedback RobotExec::publishMotors()
     fb.storageFault = "";
 
     return fb;
+}
+
+std_msgs::Bool getEnMsg()
+{
+    return enable;
 }

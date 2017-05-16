@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <ros/console.h>
 #include <std_msgs/Int64.h>
+#include <std_msgs/Bool.h>
 #include <string>
 #include "robot_msgs/Teleop.h"
 #include "robot_msgs/Autonomy.h"
@@ -59,7 +60,11 @@ int main(int argc, char **argv)
 
     ros::Publisher pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/motor/feedback", 100);
 
+    ros::Publisher pub_en = nh.advertise<std_msgs::Bool>("/robot/autonomy/enable", 100);
+
     robot_msgs::MotorFeedback motorFb;
+
+    bool autonomyEnabled = false;
 
     ROS_INFO("Astrobotics 2017 ready");
 
@@ -70,6 +75,12 @@ int main(int argc, char **argv)
     {
         ros::spinOnce();
         exec.motorHeartbeat();
+
+        if (autonomyEnabled != exec.getEnMsg().data) //if enable msg has been updated
+        {
+            autonomyEnabled = exec.getEnMsg().data;
+            pub_en.publish(exec.getEnMsg());
+        }
 
         if (exec.isAutonomyActive())
         {

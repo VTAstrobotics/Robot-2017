@@ -19,6 +19,10 @@ public:
     void setStatusLed(status_led_t value);
     bool getKillButton();
 
+    // Potentiometers
+    float getLiftPosition();
+    float getStoragePosition();
+
     // Load cells
     float getLeftStorageWeight();
     float getRightStorageWeight();

@@ -1,9 +1,18 @@
 #include "sensors.h"
 #include <gpio.h>
+#include <adc.h>
 
 // GPIOs
 const int gpioStatusLed  = 67; // FIXME get the right pin number for this
 const int gpioKillButton = 46; // GPIO 46 = P8_16
+
+// Potentiometers
+const int ainLiftPot    = 0; // AIN0 = P9_39
+const int ainStoragePot = 1; // AIN1 = P9_40
+
+const int adcRes         = 4096;
+const int liftPotDegs    = 250;
+const int storagePotDegs = 360;
 
 // Load cells
 const char* leftLoadCellPath  = "/dev/ttyO4";
@@ -35,6 +44,19 @@ void Sensors::setStatusLed(status_led_t value)
 bool Sensors::getKillButton()
 {
     return getPinValue(gpioKillButton);
+}
+
+float Sensors::getLiftPosition()
+{
+    int potRaw = get_adc(ainLiftPot);
+    return 1.0f * potRaw * liftPotDegs / adcRes;
+}
+
+float Sensors::getStoragePosition()
+{
+    int potRaw = get_adc(ainStoragePot);
+    int degs = 360;
+    return 1.0f * potRaw * storagePotDegs / adcRes;
 }
 
 float Sensors::getLeftStorageWeight()

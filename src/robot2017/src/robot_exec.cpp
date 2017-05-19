@@ -282,7 +282,8 @@ robot_msgs::MotorFeedback RobotExec::publishMotors()
     fb.drumCurrent = 0;
     fb.leftStorageWeight = sensors.getLeftStorageWeight();
     fb.rightStorageWeight = sensors.getRightStorageWeight();
-    fb.storagePos = 0;
+//    fb.liftPos = sensors.getLiftPosition(); // Uncomment when the message has been changed to include liftPos
+    fb.storagePos = sensors.getStoragePosition();
     fb.rightTreadFault = "";
     fb.leftTreadFault = "";
     fb.drumFault = "";

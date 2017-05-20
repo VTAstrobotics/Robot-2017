@@ -71,8 +71,7 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
 
     ROS_DEBUG_STREAM_COND(this->isDebugMode(),message.str());
 
-    // Make sure autonomy doesn't run if kill switch is pressed
-    if(this->autonomyActive && !dead)
+    if(this->autonomyActive)
     {
         autonomyExec(cmd);
     }
@@ -115,10 +114,9 @@ void RobotExec::modeTransition(const bool buttonState)
 // Storage:  speed (raw RPM)
 void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 {
-    // DEADMAN + physical kill switch
-    bool shouldKill = dead || !cmd.lb;
-    ROS_DEBUG_STREAM("Robot killed: " << shouldKill);
-    if(shouldKill)
+    dead = !cmd.lb;
+    ROS_DEBUG_STREAM("Robot killed: " << dead);
+    if(dead)
     {
         killMotors();
         sensors.setStatusLed(Sensors::READY);
@@ -279,6 +277,11 @@ void RobotExec::setDebugMode(bool active)
     debug = active;
 }
 
+bool RobotExec::isDead()
+{
+    return dead;
+}
+
 // Needs to be called frequently, <1s apart
 void RobotExec::motorHeartbeat()
 {
@@ -287,16 +290,6 @@ void RobotExec::motorHeartbeat()
     Lift.send_Alive();
     Storage.send_Alive();
     Bucket.send_Alive();
-}
-
-// Call frequently to check if kill button on robot is pressed
-// If pressed, will kill motors and disable teleop until released
-void RobotExec::checkKillButton() {
-    dead = sensors.getKillButton();
-    if(dead)
-    {
-        killMotors();
-    }
 }
 
 robot_msgs::MotorFeedback RobotExec::getMotorFeedback()

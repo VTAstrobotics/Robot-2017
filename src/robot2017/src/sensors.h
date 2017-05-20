@@ -17,7 +17,6 @@ public:
 
     // GPIOs
     void setStatusLed(status_led_t value);
-    bool getKillButton();
 
     // Potentiometers
     float getLiftPosition();

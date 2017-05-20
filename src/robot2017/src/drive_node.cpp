@@ -82,10 +82,9 @@ int main(int argc, char **argv)
     // establish this program as an ROS node.
     ros::NodeHandle nh;
 
-    pub_status = nh.advertise<robot_msgs::Status>(
-        "/robot/status", 100);
-    ros::Subscriber driver_ping = nh.subscribe(
-        "/driver/ping", 1000, &recievedPing);
+    pub_status = nh.advertise<robot_msgs::Status>("/robot/status", 100);
+
+    ros::Subscriber driver_ping = nh.subscribe("/driver/ping", 1000, &recievedPing);
 
     ros::Subscriber sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
 

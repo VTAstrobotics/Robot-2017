@@ -64,8 +64,10 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
 {
     std::stringstream message;
 
-    message << "Autonomy Command recieved: " << cmd.leftRatio << " "
-    << cmd.rightRatio << " " << cmd.digCmd << " " << cmd.dumpCmd;;
+    message << "Autonomy Command recieved: L:" << cmd.leftRatio << " R:"
+    << cmd.rightRatio << " Storage:" << (cmd.storageUp ? "up" : (cmd.storageDown ? "down" : "-"))
+    << " Lift:" << (cmd.liftUp ? "up" : (cmd.liftDown ? "down" : "-"))
+    << " Drum:" << cmd.drumRatio;
 
     ROS_DEBUG_STREAM_COND(this->isDebugMode(),message.str());
 
@@ -273,17 +275,21 @@ robot_msgs::MotorFeedback RobotExec::publishMotors()
     ROS_DEBUG_STREAM_COND(this->isDebugMode(), "GETTING MOTOR DATA");
 
     fb.drumRPM = bucket_Data.rpm;
+
+    fb.liftPos = sensors.getLiftPosition();
+    fb.liftRPM = lift_Data.rpm;
+
     fb.leftTreadRPM = left_Data.rpm;
     fb.rightTreadRPM = right_Data.rpm;
 
+    fb.liftCurrent = lift_Data.currentMotor;
+    fb.drumCurrent = bucket_Data.currentMotor;
+
     // TODO items not yet implemented
-    fb.liftPos = 0;
-    fb.liftCurrent = 0;
-    fb.drumCurrent = 0;
     fb.leftStorageWeight = sensors.getLeftStorageWeight();
     fb.rightStorageWeight = sensors.getRightStorageWeight();
-//    fb.liftPos = sensors.getLiftPosition(); // Uncomment when the message has been changed to include liftPos
     fb.storagePos = sensors.getStoragePosition();
+    
     fb.rightTreadFault = "";
     fb.leftTreadFault = "";
     fb.drumFault = "";

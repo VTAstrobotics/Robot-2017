@@ -112,11 +112,16 @@ int main(int argc, char **argv)
 
         //publish autonomy message
         robot_msgs::Autonomy autonomyCmd;
-        autonomyCmd.leftRatio = rand();
-        autonomyCmd.rightRatio = rand();
-        autonomyCmd.digCmd = rand();
-        autonomyCmd.dumpCmd = rand();
-        
+        autonomyCmd.leftRatio = rand()*1.0f/RAND_MAX;
+        autonomyCmd.rightRatio = rand()*1.0f/RAND_MAX;
+        int storeRand = rand();
+        autonomyCmd.storageUp = storeRand < RAND_MAX/3;
+        autonomyCmd.storageDown = storeRand >= RAND_MAX/3 && storeRand < RAND_MAX/3*2;
+        int liftRand = rand();
+        autonomyCmd.liftUp = liftRand < RAND_MAX/3;
+        autonomyCmd.liftDown = liftRand >= RAND_MAX/3 && liftRand < RAND_MAX/3*2;
+        autonomyCmd.drumRatio = rand()*1.0f/RAND_MAX;
+
         autonomyPub.publish(autonomyCmd);
     }
 

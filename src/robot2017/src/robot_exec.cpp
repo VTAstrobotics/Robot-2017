@@ -336,7 +336,7 @@ robot_msgs::MotorFeedback RobotExec::publishMotors()
     return fb;
 }
 
-std_msgs::Bool getEnMsg()
+std_msgs::Bool RobotExec::getEnMsg()
 {
     return enable;
 }

@@ -77,7 +77,8 @@ int main(int argc, char **argv)
         exec.motorHeartbeat();
         exec.checkKillButton();
 
-        if (autonomyEnabled != exec.getEnMsg().data) //if enable msg has been updated
+        // Update autonomy enable status
+        if (autonomyEnabled != exec.getEnMsg().data)
         {
             autonomyEnabled = exec.getEnMsg().data;
             pub_en.publish(exec.getEnMsg());

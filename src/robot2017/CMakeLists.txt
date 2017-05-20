@@ -3,6 +3,8 @@ project(robot2017)
 
 find_package(catkin REQUIRED COMPONENTS
   vesc_bbb_uart
+  sunrom
+  bbb_hw
   roscpp
   robot_msgs
   rosconsole
@@ -11,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES drivetest
-  CATKIN_DEPENDS vesc_bbb_uart roscpp robot_msgs rosconsole
+  CATKIN_DEPENDS vesc_bbb_uart sunrom bbb_hw roscpp robot_msgs rosconsole
 #  DEPENDS system_lib
 )
 
@@ -25,7 +27,7 @@ include_directories(
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
-add_executable(drive_node src/drive_node.cpp src/robot_exec.cpp src/motor_receive.cpp)
+add_executable(drive_node src/drive_node.cpp src/robot_exec.cpp src/motor_receive.cpp src/sensors.cpp)
 add_executable(test_controller src/test_controller.cpp)
 
 add_dependencies(drive_node robot_msgs_generate_messages_cpp)

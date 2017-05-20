@@ -13,8 +13,8 @@ const float liftSpeed    = 4000; // RPM
 const float storageSpeed = 8000; // RPM
 
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
-    : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive), prevState(false),
-      leftRatio(0.0f), rightRatio(0.0f),
+    : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
+      leftRatio(0.0f), rightRatio(0.0f), sensors(onPC), prevState(false),
       LeftDrive(LEFTDRIVE,   Alien_4260),
       RightDrive(RIGHTDRIVE, Alien_4260),
       Lift(LIFT,             Alien_4260),
@@ -23,6 +23,7 @@ RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
 {
     if(!onPC) {
         BLDC::init((char*) motorPath);
+        sensors.setStatusLed(Sensors::READY);
     }
 }
 
@@ -63,12 +64,15 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
 {
     std::stringstream message;
 
-    message << "Autonomy Command recieved: " << cmd.leftRatio << " "
-    << cmd.rightRatio << " " << cmd.digCmd << " " << cmd.dumpCmd;;
+    message << "Autonomy Command recieved: L:" << cmd.leftRatio << " R:"
+    << cmd.rightRatio << " Storage:" << (cmd.storageUp ? "up" : (cmd.storageDown ? "down" : "-"))
+    << " Lift:" << (cmd.liftUp ? "up" : (cmd.liftDown ? "down" : "-"))
+    << " Drum:" << cmd.drumRatio;
 
     ROS_DEBUG_STREAM_COND(this->isDebugMode(),message.str());
 
-    if(isAutonomyActive())
+    // Make sure autonomy doesn't run if kill switch is pressed
+    if(this->autonomyActive && !dead)
     {
         autonomyExec(cmd);
     }
@@ -111,14 +115,18 @@ void RobotExec::modeTransition(const bool buttonState)
 // Storage:  speed (raw RPM)
 void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 {
-    // DEADMAN
-    dead = !cmd.lb;
-    //write LED??? (did this last year)
-    ROS_DEBUG_STREAM("Robot dead: " << dead);
-    if(dead)
+    // DEADMAN + physical kill switch
+    bool shouldKill = dead || !cmd.lb;
+    ROS_DEBUG_STREAM("Robot killed: " << shouldKill);
+    if(shouldKill)
     {
         killMotors();
+        sensors.setStatusLed(Sensors::READY);
         return;
+    }
+    else
+    {
+        sensors.setStatusLed(Sensors::ACTIVE);
     }
 
     // DRIVING
@@ -165,21 +173,15 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     msg << "Left Ratio " << leftRatio << ", Right Ratio " << rightRatio;
     ROS_DEBUG_STREAM(msg.str());
 
-    // FIXME Not sure why we have these
-//     if(fabs(leftRatio) > 0.1 || fabs(rightRatio))
-//         return;
-
     // BUCKET DRUM
     // positive = dig, negative = dump
     if(cmd.l_trig > 0.0f)
     {
-        //TODO: dumping mechanism commands
         ROS_DEBUG_STREAM_COND(this->isDebugMode(), "ENTERED DUMPING STATE");
         Bucket.set_Duty(-cmd.l_trig);
     }
     else if(cmd.r_trig > 0.0f)
     {
-        //TODO: dig commands
         ROS_DEBUG_STREAM_COND(this->isDebugMode(), "ENTERED DIG STATE");
         Bucket.set_Duty(cmd.r_trig);
     }
@@ -199,7 +201,7 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     }
     else
     {
-        Lift.set_Speed(0.0f);
+        Lift.set_Pos(0.0f);
     }
 
     // SECONDARY STORAGE
@@ -220,8 +222,26 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
 {
     ROS_DEBUG_STREAM_COND(this->isDebugMode(), "EXECUTING AUTONOMY CMDS");
-    LeftDrive.set_Speed(cmd.leftRatio);
-    RightDrive.set_Speed(cmd.rightRatio);
+    LeftDrive.set_Duty(cmd.leftRatio);
+    RightDrive.set_Duty(cmd.rightRatio);
+
+    if(cmd.liftUp) {
+        Lift.set_Speed(-liftSpeed);
+    } else if(cmd.liftDown) {
+        Lift.set_Speed(liftSpeed);
+    } else {
+        Lift.set_Pos(0.0f);
+    }
+
+    if(cmd.storageUp) {
+        Storage.set_Speed(storageSpeed);
+    } else if(cmd.storageDown) {
+        Storage.set_Speed(-storageSpeed);
+    } else {
+        Storage.set_Speed(0.0f);
+    }
+
+    Bucket.set_Duty(cmd.drumRatio);
 }
 
 void RobotExec::killMotors()
@@ -269,6 +289,16 @@ void RobotExec::motorHeartbeat()
     Bucket.send_Alive();
 }
 
+// Call frequently to check if kill button on robot is pressed
+// If pressed, will kill motors and disable teleop until released
+void RobotExec::checkKillButton() {
+    dead = sensors.getKillButton();
+    if(dead)
+    {
+        killMotors();
+    }
+}
+
 robot_msgs::MotorFeedback RobotExec::publishMotors()
 {
     robot_msgs::MotorFeedback fb;
@@ -282,16 +312,21 @@ robot_msgs::MotorFeedback RobotExec::publishMotors()
     ROS_DEBUG_STREAM_COND(this->isDebugMode(), "GETTING MOTOR DATA");
 
     fb.drumRPM = bucket_Data.rpm;
+
+    fb.liftPos = sensors.getLiftPosition();
+    fb.liftRPM = lift_Data.rpm;
+
     fb.leftTreadRPM = left_Data.rpm;
     fb.rightTreadRPM = right_Data.rpm;
 
+    fb.liftCurrent = lift_Data.currentMotor;
+    fb.drumCurrent = bucket_Data.currentMotor;
+
     // TODO items not yet implemented
-    fb.liftPos = 0;
-    fb.liftCurrent = 0;
-    fb.drumCurrent = 0;
-    fb.leftStorageWeight = 0;
-    fb.rightStorageWeight = 0;
-    fb.storagePos = 0;
+    fb.leftStorageWeight = sensors.getLeftStorageWeight();
+    fb.rightStorageWeight = sensors.getRightStorageWeight();
+    fb.storagePos = sensors.getStoragePosition();
+    
     fb.rightTreadFault = "";
     fb.leftTreadFault = "";
     fb.drumFault = "";

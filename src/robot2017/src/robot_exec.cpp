@@ -90,6 +90,7 @@ void RobotExec::modeTransition(const bool buttonState)
         setAutonomyActive(!isAutonomyActive()); //toggle mode
         prevState = true;
 
+        ROS_DEBUG_STREAM("Changed autonomy state to " << isAutonomyActive());
         enable.data = isAutonomyActive(); //toggle data in autonomy enable message
     }
     else if (prevState == true && buttonState == false)

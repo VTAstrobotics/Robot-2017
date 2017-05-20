@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(vesc_bbb_uart)
+project(bbb_hw)
 
 find_package(catkin REQUIRED COMPONENTS)
 
@@ -14,17 +14,11 @@ catkin_package(
 ## Build ##
 ###########
 
-include_directories(src/${PROJECT_NAME})
+include_directories(src)
 
 add_library(${PROJECT_NAME}
-  src/${PROJECT_NAME}/bldc.cpp
-  src/${PROJECT_NAME}/bldc_interface.c
-  src/${PROJECT_NAME}/bldc_interface_uart.c
-  src/${PROJECT_NAME}/buffer.c
-  src/${PROJECT_NAME}/comm_uart.c
-  src/${PROJECT_NAME}/crc.c
-  src/${PROJECT_NAME}/packet.c
-  src/${PROJECT_NAME}/timers.c
+  src/adc.c
+  src/gpio.c
 )
 
 #############
@@ -38,7 +32,7 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 # Mark cpp header files for installation
-install(DIRECTORY src/${PROJECT_NAME}/
+install(DIRECTORY src
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h"
 )

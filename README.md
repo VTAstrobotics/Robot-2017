@@ -1,6 +1,16 @@
 # Robot code for Astrobotics 2017
 This repository is a catkin workspace, containing the packages that comprise the 2017 robot code.
 
+## Running on BeagleBone
+You will need to perform the following actions once to run the robot code on a BeagleBone.
+
+1. `cp system/uEnv.txt /boot` to set up the UART and ADC device trees
+   - If you have custom changes to uEnv.txt, just copy over the `cape_enable` line
+2. `cp system/99-gpio.rules /etc/udev/rules.d` to set up permissions for the GPIOs
+3. `groupadd gpio` to create a user group for GPIO access
+4. `usermod -aG gpio astrobotics` to add the user `astrobotics` to the GPIO group
+5. Reboot the system
+
 ## Building
 Assuming you have ROS already installed on your system, run the following commands:
 
@@ -15,3 +25,7 @@ After building, run the following commands:
 
 1. `source devel/setup.bash` to initialize the newly-built robot code environment
 2. `roslaunch robot2017 main.launch` to launch the robot code
+
+## Running at boot
+The code can be configured to launch automatically at boot after the network is connected, on any system that supports systemd.
+See `system/astro-robot-2017.service` for details.

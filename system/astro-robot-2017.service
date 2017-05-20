@@ -1,0 +1,20 @@
+# Service file for systemd, will launch Robot-2017 on boot after network is connected
+# Adjust user and path to cloned repo as necessary
+# To install:
+# - copy this file to `/lib/systemd/system` or `/usr/lib/systemd/system`
+# - reload systemd with `systemctl daemon-reload` (or reboot)
+# - enable with `systemctl enable astro-robot-2017`
+# Check status: `systemctl status astro-robot-2017`
+# Restart code: `systemctl restart astro-robot-2017`
+
+[Unit]
+Description=Astrobotics 2017 (A.R.E.S) robot code
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/bin/bash /home/astrobotics/Astro/Robot-2017/ares_launch.sh
+User=astrobotics
+
+[Install]
+WantedBy=multi-user.target

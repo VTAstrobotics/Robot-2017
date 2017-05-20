@@ -2,6 +2,7 @@
 // handles robot driving, including processing teleop commands and managing autonomy
 
 #include <ros/ros.h>
+#include <ros/console.h>
 #include <std_msgs/Int64.h>
 #include <std_msgs/Bool.h>
 #include <string>
@@ -9,6 +10,7 @@
 #include "robot_msgs/Autonomy.h"
 #include "robot_msgs/Status.h"
 #include "robot_exec.h"
+#include "motor_receive.h"
 
 const uint8_t statusRate = 1; // hertz
 const uint8_t maxPing = 2; // max secs between pings before shutdown
@@ -42,7 +44,7 @@ int main(int argc, char **argv)
 {
     // initialize the ROS system.
     ros::init(argc, argv, "drive_node");
-    ros::NodeHandle nh;
+
     lastDriverPing = ros::Time::now() - ros::Duration(100);
 
     // argument processing
@@ -59,6 +61,9 @@ int main(int argc, char **argv)
         else if (strcmp(argv[i], "-debug") == 0)
         {
             debug = true;
+            if(ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
+                ros::console::notifyLoggerLevelsChanged();
+            }
             ROS_WARN_STREAM("Debug mode enabled");
         } else if(strcmp(argv[i], "-aut") == 0)
         {
@@ -66,36 +71,48 @@ int main(int argc, char **argv)
             ROS_WARN_STREAM("Starting in autonomy mode");
         }
     }
-    
+
     status.robotCodeActive = true;
     status.autonomyActive = autoEnable;
     status.deadmanPressed = false;
 
     RobotExec exec(onPC, debug, autoEnable);
-    
+    MotorsReceive motors_update(exec);
+
+    // establish this program as an ROS node.
+    ros::NodeHandle nh;
+
     pub_status = nh.advertise<robot_msgs::Status>(
         "/robot/status", 100);
-    ros::Publisher pub_fb = nh.advertise<robot_msgs::MotorFeedback>(
-        "/robot/autonomy/feedback", 100);
-    ros::Subscriber sub_tele = nh.subscribe(
-        "/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
-    ros::Subscriber sub_aut = nh.subscribe(
-        "/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);
     ros::Subscriber driver_ping = nh.subscribe(
         "/driver/ping", 1000, &recievedPing);
-    
+
+    ros::Subscriber sub_tele = nh.subscribe("/robot/teleop", 1000, &RobotExec::teleopReceived, &exec);
+
+    ros::Subscriber sub_aut = nh.subscribe("/robot/autonomy", 1000, &RobotExec::autonomyReceived, &exec);
+
+    ros::Publisher pub_fb = nh.advertise<robot_msgs::MotorFeedback>("/robot/motor/feedback", 100);
+
+    ros::Publisher pub_en = nh.advertise<std_msgs::Bool>("/robot/autonomy/enable", 100);
+
     robot_msgs::MotorFeedback motorFb;
+
+    bool autonomyEnabled = false;
 
     ROS_INFO("Astrobotics 2017 ready");
     ROS_INFO("Awaiting connection to driver station...");
-    
+
     int hertz = 100;
     ros::Rate r(hertz);
 
     while(ros::ok())
     {
+        // TODO add status led code for setting HIBER when ping disconnects
         ros::spinOnce();
+        exec.motorHeartbeat();
+        exec.checkKillButton();
 
+        // Safety ping auto-disable
         double timeSince = (ros::Time::now() - lastDriverPing).toSec();
         if (timeSince > maxPing && !hibernating)
         {
@@ -109,18 +126,19 @@ int main(int argc, char **argv)
             hibernating = false;
         }
 
-        if (!hibernating && exec.isAutonomyActive())
+        publishStatus();
+
+        if (autonomyEnabled != exec.getEnMsg().data) //if enable msg has been updated
         {
-            ROS_DEBUG_STREAM("Executing motor commands");
-            motorFb = exec.publishMotors();
-            std::stringstream msg;
-            msg << motorFb.drumRPM << " " << motorFb.liftPos << " " << motorFb.leftTreadRPM
-            << " " << motorFb.rightTreadRPM;
-            ROS_DEBUG_STREAM_COND(exec.isDebugMode(), msg.str());
-            pub_fb.publish(motorFb);
+            autonomyEnabled = exec.getEnMsg().data;
+            pub_en.publish(exec.getEnMsg());
         }
 
-        publishStatus();
+        // Publishing motor data every time
+        motorFb = exec.getMotorFeedback();
+        pub_fb.publish(motorFb);
+
+        motors_update.update();
         r.sleep();
     }
     return 0;

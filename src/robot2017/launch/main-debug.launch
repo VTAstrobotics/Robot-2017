@@ -2,6 +2,7 @@
     <node name="drive_node"
         pkg="robot2017"
         type="drive_node"
+        args="-debug"
         output="screen"
         required="true"
         respawn="true"

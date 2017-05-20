@@ -169,8 +169,6 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
         Bucket.set_Duty(0.0f);
     }
 
-    // FIXME Change lift motors to use set_Position for active braking, once encoders are installed
-
     // DRUM LIFT
     // positive = down, negative = up
     if(cmd.y) {
@@ -182,7 +180,7 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     }
     else
     {
-        Lift.set_Speed(0.0f);
+        Lift.set_Position(0.0f);
     }
 
     // SECONDARY STORAGE

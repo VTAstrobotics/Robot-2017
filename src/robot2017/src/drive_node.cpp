@@ -85,7 +85,6 @@ int main(int argc, char **argv)
 
         // Publishing motor data every time
         motorFb = exec.getMotorFeedback();
-        ROS_DEBUG_STREAM(motorFb);
         pub_fb.publish(motorFb);
 
         motors_update.update();

@@ -180,7 +180,7 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     }
     else
     {
-        Lift.set_Position(0.0f);
+        Lift.set_Pos(0.0f);
     }
 
     // SECONDARY STORAGE
@@ -201,8 +201,26 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
 {
     ROS_DEBUG_STREAM_COND(this->isDebugMode(), "EXECUTING AUTONOMY CMDS");
-    LeftDrive.set_Speed(cmd.leftRatio);
-    RightDrive.set_Speed(cmd.rightRatio);
+    LeftDrive.set_Duty(cmd.leftRatio);
+    RightDrive.set_Duty(cmd.rightRatio);
+
+    if(cmd.liftUp) {
+        Lift.set_Speed(-liftSpeed);
+    } else if(cmd.liftDown) {
+        Lift.set_Speed(liftSpeed);
+    } else {
+        Lift.set_Pos(0.0f);
+    }
+
+    if(cmd.storageUp) {
+        Storage.set_Speed(storageSpeed);
+    } else if(cmd.storageDown) {
+        Storage.set_Speed(-storageSpeed);
+    } else {
+        Storage.set_Speed(0.0f);
+    }
+
+    Bucket.set_Duty(cmd.drumRatio);
 }
 
 void RobotExec::killMotors()

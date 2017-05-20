@@ -76,7 +76,6 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
     {
         autonomyExec(cmd);
     }
-    publishMotors();
 }
 
 //adds debouncing for start button
@@ -299,7 +298,7 @@ void RobotExec::checkKillButton() {
     }
 }
 
-robot_msgs::MotorFeedback RobotExec::publishMotors()
+robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
 {
     robot_msgs::MotorFeedback fb;
 

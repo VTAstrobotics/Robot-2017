@@ -83,15 +83,11 @@ int main(int argc, char **argv)
             pub_en.publish(exec.getEnMsg());
         }
 
-        if (exec.isAutonomyActive())
-        {
-            motorFb = exec.publishMotors();
-            std::stringstream msg;
-            msg << motorFb.drumRPM << " " << motorFb.liftPos << " " << motorFb.leftTreadRPM
-            << " " << motorFb.rightTreadRPM;
-            ROS_DEBUG_STREAM_COND(exec.isDebugMode(), msg.str());
-            pub_fb.publish(motorFb);
-        }
+        // Publishing motor data every time
+        motorFb = exec.getMotorFeedback();
+        ROS_DEBUG_STREAM(motorFb.drumRPM << " " << motorFb.liftPos << " " << motorFb.leftTreadRPM
+        << " " << motorFb.rightTreadRPM);
+        pub_fb.publish(motorFb);
 
         motors_update.update();
         r.sleep();

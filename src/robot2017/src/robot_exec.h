@@ -59,7 +59,7 @@ class RobotExec
         void motorHeartbeat();
         void checkKillButton();
 
-        robot_msgs::MotorFeedback publishMotors();
+        robot_msgs::MotorFeedback getMotorFeedback();
         std_msgs::Bool getEnMsg();
 };
 

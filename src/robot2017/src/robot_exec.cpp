@@ -95,8 +95,8 @@ void RobotExec::autonomyReceived(const robot_msgs::Autonomy& cmd)
 void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 {
     // DEADMAN + physical kill switch
-    ROS_DEBUG_STREAM("Robot dead: " << dead);
     bool shouldKill = dead || !cmd.lb;
+    ROS_DEBUG_STREAM("Robot killed: " << shouldKill);
     if(shouldKill)
     {
         killMotors();

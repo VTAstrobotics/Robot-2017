@@ -110,7 +110,6 @@ int main(int argc, char **argv)
         // TODO add status led code for setting HIBER when ping disconnects
         ros::spinOnce();
         exec.motorHeartbeat();
-        exec.checkKillButton();
 
         // Safety ping auto-disable
         double timeSince = (ros::Time::now() - lastDriverPing).toSec();
@@ -128,7 +127,8 @@ int main(int argc, char **argv)
 
         publishStatus();
 
-        if (autonomyEnabled != exec.getEnMsg().data) //if enable msg has been updated
+        // Update autonomy enable status
+        if (autonomyEnabled != exec.getEnMsg().data)
         {
             autonomyEnabled = exec.getEnMsg().data;
             pub_en.publish(exec.getEnMsg());

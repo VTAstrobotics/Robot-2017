@@ -19,7 +19,7 @@ class RobotExec
 {
     friend MotorsReceive;
     private:
-        bool dead; // This indicates if the physical kill switch on the robot is pressed
+        bool dead;  // Killed by an estop or by deadman
         bool onPC;
         bool debug;
         bool autonomyActive;
@@ -56,8 +56,9 @@ class RobotExec
         bool isAutonomyActive();
         void setAutonomyActive(bool active);
 
+        bool isDead();
+
         void motorHeartbeat();
-        void checkKillButton();
 
         robot_msgs::MotorFeedback getMotorFeedback();
         std_msgs::Bool getEnMsg();

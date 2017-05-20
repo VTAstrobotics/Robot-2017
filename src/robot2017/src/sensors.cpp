@@ -4,7 +4,6 @@
 
 // GPIOs
 const int gpioStatusLed  = 67; // FIXME get the right pin number for this
-const int gpioKillButton = 46; // GPIO 46 = P8_16
 
 // Potentiometers
 const int ainLiftPot    = 0; // AIN0 = P9_39
@@ -32,10 +31,6 @@ void Sensors::initGpio()
     // Status LED
     initPin(gpioStatusLed);
     setPinDirection(gpioStatusLed, (char*)"out");
-
-    // Kill button
-    initPin(gpioKillButton);
-    setPinDirection(gpioKillButton, (char*)"in");
 }
 
 void Sensors::initLoadCells()
@@ -47,15 +42,6 @@ void Sensors::initLoadCells()
 void Sensors::setStatusLed(status_led_t value)
 {
     // TODO implement status LED
-}
-
-bool Sensors::getKillButton()
-{
-    if(onPC) {
-        return false;
-    } else {
-        return getPinValue(gpioKillButton);
-    }
 }
 
 float Sensors::getLiftPosition()

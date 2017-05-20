@@ -5,6 +5,9 @@ MotorsReceive::MotorsReceive(RobotExec& exec) : exec(exec) {
 }
 
 void MotorsReceive::update() {
+    if(exec.isOnPC()) {
+        return;
+    }
     switch(read_mode){
         case RequestMotor1:
             exec.LeftDrive.request_Values();

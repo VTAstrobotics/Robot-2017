@@ -1,5 +1,5 @@
 <launch>
-    <node name="drive_node" pkg="robot2017" type="drive_node" args="-pc" output="screen">
+    <node name="drive_node" pkg="robot2017" type="drive_node" args="-pc -debug" output="screen">
     </node>
     <node name="test_controller" pkg="robot2017" type="test_controller" output="screen">
     </node>

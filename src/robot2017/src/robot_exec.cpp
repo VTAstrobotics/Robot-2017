@@ -302,6 +302,10 @@ robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
 {
     robot_msgs::MotorFeedback fb;
 
+    if(onPC) {
+        return fb;
+    }
+
     //get RPM methods will be implemented here
     RxData left_Data = LeftDrive.get_Values();
     RxData right_Data = RightDrive.get_Values();

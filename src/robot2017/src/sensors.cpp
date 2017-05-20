@@ -18,11 +18,13 @@ const int storagePotDegs = 360;
 const char* leftLoadCellPath  = "/dev/ttyO4";
 const char* rightLoadCellPath = "/dev/ttyO5";
 
-Sensors::Sensors()
-    : leftLoadCell((char*) leftLoadCellPath, LOAD_CELL_SCALE),
-      rightLoadCell((char*) rightLoadCellPath, LOAD_CELL_SCALE)
+Sensors::Sensors(bool onPC) : onPC(onPC)
 {
-    initGpio();
+    if(!onPC)
+    {
+        initGpio();
+        initLoadCells();
+    }
 }
 
 void Sensors::initGpio()
@@ -36,6 +38,12 @@ void Sensors::initGpio()
     setPinDirection(gpioKillButton, (char*)"in");
 }
 
+void Sensors::initLoadCells()
+{
+    leftLoadCell  = new SUNROM((char*) leftLoadCellPath,  LOAD_CELL_SCALE);
+    rightLoadCell = new SUNROM((char*) rightLoadCellPath, LOAD_CELL_SCALE);
+}
+
 void Sensors::setStatusLed(status_led_t value)
 {
     // TODO implement status LED
@@ -43,30 +51,49 @@ void Sensors::setStatusLed(status_led_t value)
 
 bool Sensors::getKillButton()
 {
-    return getPinValue(gpioKillButton);
+    if(onPC) {
+        return false;
+    } else {
+        return getPinValue(gpioKillButton);
+    }
 }
 
 float Sensors::getLiftPosition()
 {
-    int potRaw = get_adc(ainLiftPot);
-    return 1.0f * potRaw * liftPotDegs / adcRes;
+    if(onPC) {
+        return 0.0f;
+    } else {
+        int potRaw = get_adc(ainLiftPot);
+        return 1.0f * potRaw * liftPotDegs / adcRes;
+    }
 }
 
 float Sensors::getStoragePosition()
 {
-    int potRaw = get_adc(ainStoragePot);
-    int degs = 360;
-    return 1.0f * potRaw * storagePotDegs / adcRes;
+    if(onPC) {
+        return 0.0f;
+    } else {
+        int potRaw = get_adc(ainStoragePot);
+        return 1.0f * potRaw * storagePotDegs / adcRes;
+    }
 }
 
 float Sensors::getLeftStorageWeight()
 {
-    leftLoadCell.update_load();
-    return leftLoadCell.get_load();
+    if(onPC) {
+        return 0.0f;
+    } else {
+        leftLoadCell->update_load();
+        return leftLoadCell->get_load();
+    }
 }
 
 float Sensors::getRightStorageWeight()
 {
-    rightLoadCell.update_load();
-    return rightLoadCell.get_load();
+    if(onPC) {
+        return 0.0f;
+    } else {
+        rightLoadCell->update_load();
+        return rightLoadCell->get_load();
+    }
 }

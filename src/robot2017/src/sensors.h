@@ -13,7 +13,7 @@ public:
     // Hibernate: lost connection to drive (red)
     enum status_led_t {READY, ACTIVE, HIBER};
 
-    Sensors();
+    Sensors(bool onPC);
 
     // GPIOs
     void setStatusLed(status_led_t value);
@@ -31,9 +31,11 @@ private:
     const float LOAD_CELL_SCALE = 0.38; // Default 40kg load cell scaling factor
 
     void initGpio();
+    void initLoadCells();
 
-    SUNROM leftLoadCell;
-    SUNROM rightLoadCell;
+    bool onPC;
+    SUNROM* leftLoadCell;
+    SUNROM* rightLoadCell;
 };
 
 #endif

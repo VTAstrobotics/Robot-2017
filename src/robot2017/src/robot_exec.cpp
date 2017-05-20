@@ -14,7 +14,7 @@ const float storageSpeed = 8000; // RPM
 
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
     : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
-      leftRatio(0.0f), rightRatio(0.0f),
+      leftRatio(0.0f), rightRatio(0.0f), sensors(onPC),
       LeftDrive(LEFTDRIVE,   Alien_4260),
       RightDrive(RIGHTDRIVE, Alien_4260),
       Lift(LIFT,             Alien_4260),

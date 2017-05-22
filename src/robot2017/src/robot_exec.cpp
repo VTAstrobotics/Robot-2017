@@ -9,8 +9,8 @@
 const char* motorPath = "/dev/ttyO1";  // Connected via UART
 // const char* motorPath = "/dev/ttyUSB0" // Connected via USB
 
-const float liftSpeed    = 4000; // RPM
-const float storageSpeed = 8000; // RPM
+const float liftSpeed    = 5000;  // RPM
+const float storageSpeed = 30000; // RPM
 
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
     : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),

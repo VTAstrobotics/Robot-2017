@@ -9,7 +9,7 @@ Date: 5/7/2017
 #include <time.h>
 
 #define MAX_TRIES 10 // Max 10 tries
-#define TRY_SLEEP 20 // Wait 20ms between tries, total of 200ms
+#define TRY_SLEEP 200 // Wait 20ms between tries, total of 2000ms
 
 int initPin(int pinnum)
 {
@@ -36,6 +36,7 @@ int initPin(int pinnum)
 	if(pdir == NULL)
 	{
 		// GPIOs failed to export after waiting
+        fprintf(stderr, "Failed to initialize GPIO %d\n", pinnum);
 		return -1;
 	}
 

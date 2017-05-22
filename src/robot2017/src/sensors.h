@@ -4,8 +4,6 @@
 #ifndef SENSORS_H
 #define SENSORS_H
 
-#include <sunrom.h>
-
 class Sensors {
 public:
     // Ready:     code started             (blue)
@@ -20,21 +18,11 @@ public:
 
     // Potentiometers
     float getLiftPosition();
-    float getStoragePosition();
-
-    // Load cells
-    float getLeftStorageWeight();
-    float getRightStorageWeight();
 
 private:
-    const float LOAD_CELL_SCALE = 0.38; // Default 40kg load cell scaling factor
-
     void initGpio();
-    void initLoadCells();
 
     bool onPC;
-    SUNROM* leftLoadCell;
-    SUNROM* rightLoadCell;
 };
 
 #endif

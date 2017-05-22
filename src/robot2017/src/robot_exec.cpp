@@ -319,10 +319,10 @@ robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
     fb.liftCurrent = lift_Data.currentMotor;
     fb.drumCurrent = bucket_Data.currentMotor;
 
-    // TODO items not yet implemented
-    fb.leftStorageWeight = sensors.getLeftStorageWeight();
-    fb.rightStorageWeight = sensors.getRightStorageWeight();
-    fb.storagePos = sensors.getStoragePosition();
+    // These values are no longer needed
+    fb.leftStorageWeight = 0;
+    fb.rightStorageWeight = 0;
+    fb.storagePos = 0;
     
     fb.rightTreadFault = "";
     fb.leftTreadFault = "";

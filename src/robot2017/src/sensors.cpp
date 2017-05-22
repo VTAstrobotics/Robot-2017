@@ -6,10 +6,11 @@
 const int gpioStatusLed  = 67; // FIXME get the right pin number for this
 
 // Potentiometers
-const int ainLiftPot    = 0; // AIN0 = P9_39
+const int adcRes = 4096;
 
-const int adcRes         = 4096;
-const int liftPotDegs    = 250;
+const int ainLiftPot    = 0;   // AIN0 = P9_39
+const int liftPotDegs   = 250;
+const int liftPotOffset = -15;
 
 Sensors::Sensors(bool onPC) : onPC(onPC)
 {
@@ -37,6 +38,7 @@ float Sensors::getLiftPosition()
         return 0.0f;
     } else {
         int potRaw = get_adc(ainLiftPot);
-        return 1.0f * potRaw * liftPotDegs / adcRes;
+        float potAngle = 1.0f * potRaw * liftPotDegs / adcRes;
+        return potAngle + liftPotOffset;
     }
 }

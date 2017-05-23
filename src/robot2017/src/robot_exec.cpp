@@ -331,6 +331,8 @@ robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
     fb.storageDownLimit = sensors.getStorageDownLimit();
     fb.storageUpLimit = sensors.getStorageUpLimit();
 
+    fb.batVoltage = lift_Data.voltageIn;
+
     fb.rightTreadFault = "";
     fb.leftTreadFault = "";
     fb.drumFault = "";

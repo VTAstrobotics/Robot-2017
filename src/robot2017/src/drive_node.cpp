@@ -14,8 +14,6 @@
 
 const uint8_t statusRate = 1; // hertz
 const uint8_t maxPing = 2; // max secs between pings before shutdown
-bool onBeagleBone = true;
-bool autState = false;
 bool hibernating = true;
 
 ros::Publisher pub_status; // declared globally for publishStatus()

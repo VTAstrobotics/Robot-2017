@@ -9,8 +9,13 @@
 const char* motorPath = "/dev/ttyO1";  // Connected via UART
 // const char* motorPath = "/dev/ttyUSB0" // Connected via USB
 
-const float liftSpeed    = 4000; // RPM
-const float storageSpeed = 8000; // RPM
+const int liftSpeedSlow = 5000;  // RPM
+const int liftSpeedFast = 20000; // RPM
+const int storageSpeed  = 30000; // RPM
+
+// Actual limits are up:0, down:180
+const int liftDownLimit = 165;
+const int liftUpLimit   = 10;
 
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
     : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
@@ -101,11 +106,13 @@ void RobotExec::modeTransition(const bool buttonState)
 }
 
 // ==== TELEOP CONTROLS ====
-// Driving:  left stick Y, right stick X
-// Drum:     trigger L (dump), trigger R (dig)
-// Lift:     button Y (up), button A (down)
-// Storage:  button B (up), button X (down)
-// Autonomy: button Start (toggle)
+// Driving:   left stick Y, right stick X
+// Drum:      trigger L (dump), trigger R (dig)
+// Lift:      button Y (up), button A (down)
+// Storage:   button B (up), button X (down)
+// Autonomy:  button Start (toggle)
+// Deadman:   L bumper (hold)
+// Slow lift: R bumper (hold)
 //  - autonomy toggle control is in teleopReceived
 // ==== MOTOR CONTROLS ====
 // Driving:  duty cycle (% voltage, -1.0 to 1.0)
@@ -190,12 +197,15 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 
     // DRUM LIFT
     // positive = down, negative = up
-    if(cmd.y) {
-        Lift.set_Speed(-liftSpeed);
+    int teleopLiftSpeed = (cmd.rb ? liftSpeedSlow : liftSpeedFast);
+    if(cmd.y && checkLimit(DIR_UP, ARM_LIFT)) {
+        lastLiftDir = DIR_UP;
+        Lift.set_Speed(-teleopLiftSpeed);
     }
-    else if(cmd.a)
+    else if(cmd.a && checkLimit(DIR_DOWN, ARM_LIFT))
     {
-        Lift.set_Speed(liftSpeed);
+        lastLiftDir = DIR_DOWN;
+        Lift.set_Speed(teleopLiftSpeed);
     }
     else
     {
@@ -203,12 +213,15 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     }
 
     // SECONDARY STORAGE
-    if(cmd.b)
+    // positive = down, negative = up
+    if(cmd.x && checkLimit(DIR_DOWN, ARM_STORAGE))
     {
+        lastStorageDir = DIR_DOWN;
         Storage.set_Speed(storageSpeed);
     }
-    else if(cmd.x)
+    else if(cmd.b && checkLimit(DIR_UP, ARM_STORAGE))
     {
+        lastStorageDir = DIR_UP;
         Storage.set_Speed(-storageSpeed);
     }
     else
@@ -223,18 +236,19 @@ void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
     LeftDrive.set_Duty(cmd.leftRatio);
     RightDrive.set_Duty(cmd.rightRatio);
 
-    if(cmd.liftUp) {
-        Lift.set_Speed(-liftSpeed);
-    } else if(cmd.liftDown) {
-        Lift.set_Speed(liftSpeed);
+    int autoLiftSpeed = cmd.liftSpeed;
+    if(cmd.liftUp && checkLimit(DIR_UP, ARM_LIFT)) {
+        Lift.set_Speed(-autoLiftSpeed);
+    } else if(cmd.liftDown && checkLimit(DIR_DOWN, ARM_LIFT)) {
+        Lift.set_Speed(autoLiftSpeed);
     } else {
         Lift.set_Pos(0.0f);
     }
 
-    if(cmd.storageUp) {
-        Storage.set_Speed(storageSpeed);
-    } else if(cmd.storageDown) {
+    if(cmd.storageUp && checkLimit(DIR_UP, ARM_STORAGE)) {
         Storage.set_Speed(-storageSpeed);
+    } else if(cmd.storageDown && checkLimit(DIR_DOWN, ARM_STORAGE)) {
+        Storage.set_Speed(storageSpeed);
     } else {
         Storage.set_Speed(0.0f);
     }
@@ -292,6 +306,18 @@ void RobotExec::motorHeartbeat()
     Bucket.send_Alive();
 }
 
+void RobotExec::enforceLimits()
+{
+    // Check all limits to make sure limits are not
+    // passed when holding down button
+    if((lastLiftDir == DIR_DOWN && !checkLimit(DIR_DOWN, ARM_LIFT))
+    || (lastLiftDir == DIR_UP   && !checkLimit(DIR_UP,   ARM_LIFT)))
+        Lift.set_Pos(0.0f);
+    if((lastStorageDir == DIR_DOWN && !checkLimit(DIR_DOWN, ARM_STORAGE))
+    || (lastStorageDir == DIR_UP   && !checkLimit(DIR_UP,   ARM_STORAGE)))
+        Storage.set_Speed(0.0f);
+}
+
 robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
 {
     robot_msgs::MotorFeedback fb;
@@ -306,24 +332,23 @@ robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
     RxData lift_Data = Lift.get_Values();
     RxData bucket_Data = Bucket.get_Values();
 
-    ROS_DEBUG_STREAM_COND(this->isDebugMode(), "GETTING MOTOR DATA");
-
     fb.drumRPM = bucket_Data.rpm;
+    fb.drumCurrent = bucket_Data.currentMotor;
 
+    fb.liftDownLimit = !checkLimit(DIR_DOWN, ARM_LIFT, false);
+    fb.liftUpLimit = !checkLimit(DIR_UP, ARM_LIFT, false);
     fb.liftPos = sensors.getLiftPosition();
     fb.liftRPM = lift_Data.rpm;
+    fb.liftCurrent = lift_Data.currentMotor;
 
     fb.leftTreadRPM = left_Data.rpm;
     fb.rightTreadRPM = right_Data.rpm;
 
-    fb.liftCurrent = lift_Data.currentMotor;
-    fb.drumCurrent = bucket_Data.currentMotor;
+    fb.storageDownLimit = sensors.getStorageDownLimit();
+    fb.storageUpLimit = sensors.getStorageUpLimit();
 
-    // TODO items not yet implemented
-    fb.leftStorageWeight = sensors.getLeftStorageWeight();
-    fb.rightStorageWeight = sensors.getRightStorageWeight();
-    fb.storagePos = sensors.getStoragePosition();
-    
+    fb.batVoltage = lift_Data.voltageIn;
+
     fb.rightTreadFault = "";
     fb.leftTreadFault = "";
     fb.drumFault = "";
@@ -336,4 +361,39 @@ robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
 std_msgs::Bool RobotExec::getEnMsg()
 {
     return enable;
+}
+
+// Returns true if within limits, false if limits hit
+bool RobotExec::checkLimit(dir_t dir, arm_t arm, bool printlimit)
+{
+    bool ret;
+    if(arm == ARM_LIFT)
+    {
+        // Going down increases angle
+        float liftAngle = sensors.getLiftPosition();
+        if(dir == DIR_DOWN && liftAngle > liftDownLimit)
+            ret = false;
+        else if(dir == DIR_UP && liftAngle < liftUpLimit)
+            ret = false;
+        else
+            ret = true;
+    }
+    else
+    {
+        // Storage uses limit switches
+        if(dir == DIR_DOWN && sensors.getStorageDownLimit())
+            ret = false;
+        else if(dir == DIR_UP && sensors.getStorageUpLimit())
+            ret = false;
+        else
+            ret = true;
+    }
+
+    if(!ret && printlimit)
+    {
+        const char* dirStr = (dir == DIR_DOWN ? "down" : "up");
+        const char* armStr = (arm == ARM_LIFT ? "lift" : "storage");
+        ROS_DEBUG_STREAM("Hit " << armStr << " " << dirStr << " limit!");
+    }
+    return ret;
 }

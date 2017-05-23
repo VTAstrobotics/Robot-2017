@@ -109,6 +109,7 @@ int main(int argc, char **argv)
         // TODO add status led code for setting HIBER when ping disconnects
         ros::spinOnce();
         exec.motorHeartbeat();
+        exec.enforceLimits();
 
         // Safety ping auto-disable
         double timeSince = (ros::Time::now() - lastDriverPing).toSec();

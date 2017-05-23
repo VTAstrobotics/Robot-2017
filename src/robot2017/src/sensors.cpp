@@ -3,26 +3,22 @@
 #include <adc.h>
 
 // GPIOs
-const int gpioStatusLed  = 67; // FIXME get the right pin number for this
+const int gpioStatusLed        = 67; // FIXME get the right pin number for this
+const int gpioStorageDownLimit = 65; // GPIO_65 = P8_18
+const int gpioStorageUpLimit   = 11; // GPIO_11 = P8_32
 
 // Potentiometers
-const int ainLiftPot    = 0; // AIN0 = P9_39
-const int ainStoragePot = 1; // AIN1 = P9_40
+const int adcRes = 4095;
 
-const int adcRes         = 4096;
-const int liftPotDegs    = 250;
-const int storagePotDegs = 360;
-
-// Load cells
-const char* leftLoadCellPath  = "/dev/ttyO4";
-const char* rightLoadCellPath = "/dev/ttyO5";
+const int ainLiftPot    = 0;   // AIN0 = P9_39
+const int liftPotDegs   = 250;
+const int liftPotOffset = -15;
 
 Sensors::Sensors(bool onPC) : onPC(onPC)
 {
     if(!onPC)
     {
         initGpio();
-        initLoadCells();
     }
 }
 
@@ -31,12 +27,12 @@ void Sensors::initGpio()
     // Status LED
     initPin(gpioStatusLed);
     setPinDirection(gpioStatusLed, (char*)"out");
-}
 
-void Sensors::initLoadCells()
-{
-    leftLoadCell  = new SUNROM((char*) leftLoadCellPath,  LOAD_CELL_SCALE);
-    rightLoadCell = new SUNROM((char*) rightLoadCellPath, LOAD_CELL_SCALE);
+    // Storage limits
+    initPin(gpioStorageDownLimit);
+    setPinDirection(gpioStorageDownLimit, (char*)"in");
+    initPin(gpioStorageUpLimit);
+    setPinDirection(gpioStorageUpLimit, (char*)"in");
 }
 
 void Sensors::setStatusLed(status_led_t value)
@@ -50,36 +46,17 @@ float Sensors::getLiftPosition()
         return 0.0f;
     } else {
         int potRaw = get_adc(ainLiftPot);
-        return 1.0f * potRaw * liftPotDegs / adcRes;
+        float potAngle = 1.0f * potRaw * liftPotDegs / adcRes;
+        return potAngle + liftPotOffset;
     }
 }
 
-float Sensors::getStoragePosition()
+bool Sensors::getStorageDownLimit()
 {
-    if(onPC) {
-        return 0.0f;
-    } else {
-        int potRaw = get_adc(ainStoragePot);
-        return 1.0f * potRaw * storagePotDegs / adcRes;
-    }
+    return getPinValue(gpioStorageDownLimit);
 }
 
-float Sensors::getLeftStorageWeight()
+bool Sensors::getStorageUpLimit()
 {
-    if(onPC) {
-        return 0.0f;
-    } else {
-        leftLoadCell->update_load();
-        return leftLoadCell->get_load();
-    }
-}
-
-float Sensors::getRightStorageWeight()
-{
-    if(onPC) {
-        return 0.0f;
-    } else {
-        rightLoadCell->update_load();
-        return rightLoadCell->get_load();
-    }
+    return getPinValue(gpioStorageUpLimit);
 }

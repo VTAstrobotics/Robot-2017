@@ -6,6 +6,11 @@ Date: 5/7/2017
 #include <stdio.h>
 #include "gpio.h"
 #include <string.h>
+#include <time.h>
+
+#define MAX_TRIES 10 // Max 10 tries
+#define TRY_SLEEP 200 // Wait 20ms between tries, total of 2000ms
+
 int initPin(int pinnum)
 {
 	FILE *io;
@@ -15,6 +20,25 @@ int initPin(int pinnum)
 	fprintf(io,"%d",pinnum);
 	fflush(io);
 	fclose(io);
+
+	// Test to make sure GPIO was exported successfully
+	char buf[50];
+	sprintf(buf,"/sys/class/gpio/gpio%d/direction", pinnum);
+	int tries = 0;
+	FILE* pdir = NULL;
+	while(tries < MAX_TRIES && pdir == NULL)
+	{
+		pdir = fopen(buf, "w");
+		tries++;
+		struct timespec delay = {0, TRY_SLEEP * 1000 * 1000};
+		nanosleep(&delay, NULL);
+	}
+	if(pdir == NULL)
+	{
+		// GPIOs failed to export after waiting
+        fprintf(stderr, "Failed to initialize GPIO %d\n", pinnum);
+		return -1;
+	}
 
 	return 0;
 }

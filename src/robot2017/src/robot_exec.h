@@ -19,6 +19,11 @@ class RobotExec
 {
     friend MotorsReceive;
     private:
+        enum dir_t {DIR_UP, DIR_DOWN};
+        enum arm_t {ARM_LIFT, ARM_STORAGE};
+
+        bool checkLimit(dir_t dir, arm_t arm, bool printlimit = true);
+
         bool dead;  // Killed by an estop or by deadman
         bool onPC;
         bool debug;
@@ -33,6 +38,8 @@ class RobotExec
         BLDC Storage;
         BLDC Bucket;
         Sensors sensors;
+        dir_t lastLiftDir;
+        dir_t lastStorageDir;
 
         std_msgs::Bool enable;
 
@@ -59,6 +66,7 @@ class RobotExec
         bool isDead();
 
         void motorHeartbeat();
+        void enforceLimits();
 
         robot_msgs::MotorFeedback getMotorFeedback();
         std_msgs::Bool getEnMsg();

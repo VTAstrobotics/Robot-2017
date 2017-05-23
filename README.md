@@ -5,7 +5,7 @@ This repository is a catkin workspace, containing the packages that comprise the
 You will need to perform the following actions once to run the robot code on a BeagleBone.
 
 1. `cp system/uEnv.txt /boot` to set up the UART and ADC device trees
-   - If you have custom changes to uEnv.txt, just copy over the `cape_enable` line
+   - If you have custom changes to uEnv.txt, just copy over the `cape_enable` line, also disable HDMI
 2. `cp system/99-gpio.rules /etc/udev/rules.d` to set up permissions for the GPIOs
 3. `groupadd gpio` to create a user group for GPIO access
 4. `usermod -aG gpio astrobotics` to add the user `astrobotics` to the GPIO group

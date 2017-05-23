@@ -242,9 +242,9 @@ void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
     }
 
     if(cmd.storageUp && checkLimit(DIR_UP, ARM_STORAGE)) {
-        Storage.set_Speed(storageSpeed);
-    } else if(cmd.storageDown && checkLimit(DIR_DOWN, ARM_STORAGE)) {
         Storage.set_Speed(-storageSpeed);
+    } else if(cmd.storageDown && checkLimit(DIR_DOWN, ARM_STORAGE)) {
+        Storage.set_Speed(storageSpeed);
     } else {
         Storage.set_Speed(0.0f);
     }

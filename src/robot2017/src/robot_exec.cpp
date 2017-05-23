@@ -6,16 +6,21 @@
 #include <std_msgs/Int64.h>
 #include <string>
 
+// TODO slow lift speed between 0-5 deg
+// TODO also look into reducing deadzone
+// TODO prevent raising storage when lift is up
+
 const char* motorPath = "/dev/ttyO1";  // Connected via UART
 // const char* motorPath = "/dev/ttyUSB0" // Connected via USB
+const float motorSlowScale = 0.5f;
 
 const int liftSpeedSlow = 5000;  // RPM
 const int liftSpeedFast = 20000; // RPM
 const int storageSpeed  = 30000; // RPM
 
 // Actual limits are up:0, down:180
-const int liftDownLimit = 165;
-const int liftUpLimit   = 10;
+const int liftDownLimit = 140;
+const int liftUpLimit   = 5;
 
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
     : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
@@ -106,14 +111,15 @@ void RobotExec::modeTransition(const bool buttonState)
 }
 
 // ==== TELEOP CONTROLS ====
-// Driving:   left stick Y, right stick X
-// Drum:      trigger L (dump), trigger R (dig)
-// Lift:      button Y (up), button A (down)
-// Storage:   button B (up), button X (down)
-// Autonomy:  button Start (toggle)
-// Deadman:   L bumper (hold)
-// Slow lift: R bumper (hold)
+// Driving:  left stick Y, right stick X
+// Drum:     trigger L (dump), trigger R (dig)
+// Lift:     button Y (up), button A (down)
+// Storage:  button B (up), button X (down)
+// Autonomy: button Start (toggle)
 //  - autonomy toggle control is in teleopReceived
+// Deadman:  L bumper (hold)
+// Slow:     R bumper (hold)
+//  - only applies to lift and drive
 // ==== MOTOR CONTROLS ====
 // Driving:  duty cycle (% voltage, -1.0 to 1.0)
 // Drum:     duty cycle (% voltage, -1.0 to 1.0)
@@ -171,6 +177,11 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     }
 
     if(!this->onPC) {
+        if(cmd.rb)
+        {
+            leftRatio  *= motorSlowScale;
+            rightRatio *= motorSlowScale;
+        }
         LeftDrive.set_Duty(leftRatio);
         RightDrive.set_Duty(rightRatio);
     }

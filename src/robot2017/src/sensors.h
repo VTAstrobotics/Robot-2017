@@ -15,6 +15,8 @@ public:
 
     // GPIOs
     void setStatusLed(status_led_t value);
+    bool getStorageDownLimit();
+    bool getStorageUpLimit();
 
     // Potentiometers
     float getLiftPosition();

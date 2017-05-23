@@ -13,6 +13,10 @@ const int liftSpeedSlow = 5000;  // RPM
 const int liftSpeedFast = 20000; // RPM
 const int storageSpeed  = 30000; // RPM
 
+// Actual limits are up:0, down:180
+const int liftDownLimit = 165;
+const int liftUpLimit   = 10;
+
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
     : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
       leftRatio(0.0f), rightRatio(0.0f), sensors(onPC), prevState(false),
@@ -102,11 +106,13 @@ void RobotExec::modeTransition(const bool buttonState)
 }
 
 // ==== TELEOP CONTROLS ====
-// Driving:  left stick Y, right stick X
-// Drum:     trigger L (dump), trigger R (dig)
-// Lift:     button Y (up), button A (down)
-// Storage:  button B (up), button X (down)
-// Autonomy: button Start (toggle)
+// Driving:   left stick Y, right stick X
+// Drum:      trigger L (dump), trigger R (dig)
+// Lift:      button Y (up), button A (down)
+// Storage:   button B (up), button X (down)
+// Autonomy:  button Start (toggle)
+// Deadman:   L bumper (hold)
+// Slow lift: R bumper (hold)
 //  - autonomy toggle control is in teleopReceived
 // ==== MOTOR CONTROLS ====
 // Driving:  duty cycle (% voltage, -1.0 to 1.0)
@@ -192,10 +198,10 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     // DRUM LIFT
     // positive = down, negative = up
     int teleopLiftSpeed = (cmd.rb ? liftSpeedSlow : liftSpeedFast);
-    if(cmd.y) {
+    if(cmd.y && checkLimit(DIR_UP, ARM_LIFT)) {
         Lift.set_Speed(-teleopLiftSpeed);
     }
-    else if(cmd.a)
+    else if(cmd.a && checkLimit(DIR_DOWN, ARM_LIFT))
     {
         Lift.set_Speed(teleopLiftSpeed);
     }
@@ -205,11 +211,12 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     }
 
     // SECONDARY STORAGE
-    if(cmd.b)
+    // positive = down, negative = up
+    if(cmd.x && checkLimit(DIR_DOWN, ARM_STORAGE))
     {
         Storage.set_Speed(storageSpeed);
     }
-    else if(cmd.x)
+    else if(cmd.b && checkLimit(DIR_UP, ARM_STORAGE))
     {
         Storage.set_Speed(-storageSpeed);
     }
@@ -226,17 +233,17 @@ void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
     RightDrive.set_Duty(cmd.rightRatio);
 
     int autoLiftSpeed = cmd.liftSpeed;
-    if(cmd.liftUp) {
+    if(cmd.liftUp && checkLimit(DIR_UP, ARM_LIFT)) {
         Lift.set_Speed(-autoLiftSpeed);
-    } else if(cmd.liftDown) {
+    } else if(cmd.liftDown && checkLimit(DIR_DOWN, ARM_LIFT)) {
         Lift.set_Speed(autoLiftSpeed);
     } else {
         Lift.set_Pos(0.0f);
     }
 
-    if(cmd.storageUp) {
+    if(cmd.storageUp && checkLimit(DIR_UP, ARM_STORAGE)) {
         Storage.set_Speed(storageSpeed);
-    } else if(cmd.storageDown) {
+    } else if(cmd.storageDown && checkLimit(DIR_DOWN, ARM_STORAGE)) {
         Storage.set_Speed(-storageSpeed);
     } else {
         Storage.set_Speed(0.0f);
@@ -312,21 +319,20 @@ robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
     ROS_DEBUG_STREAM_COND(this->isDebugMode(), "GETTING MOTOR DATA");
 
     fb.drumRPM = bucket_Data.rpm;
+    fb.drumCurrent = bucket_Data.currentMotor;
 
+    fb.liftDownLimit = !checkLimit(DIR_DOWN, ARM_LIFT, false);
+    fb.liftUpLimit = !checkLimit(DIR_UP, ARM_LIFT, false);
     fb.liftPos = sensors.getLiftPosition();
     fb.liftRPM = lift_Data.rpm;
+    fb.liftCurrent = lift_Data.currentMotor;
 
     fb.leftTreadRPM = left_Data.rpm;
     fb.rightTreadRPM = right_Data.rpm;
 
-    fb.liftCurrent = lift_Data.currentMotor;
-    fb.drumCurrent = bucket_Data.currentMotor;
+    fb.storageDownLimit = sensors.getStorageDownLimit();
+    fb.storageUpLimit = sensors.getStorageUpLimit();
 
-    // These values are no longer needed
-    fb.leftStorageWeight = 0;
-    fb.rightStorageWeight = 0;
-    fb.storagePos = 0;
-    
     fb.rightTreadFault = "";
     fb.leftTreadFault = "";
     fb.drumFault = "";
@@ -339,4 +345,39 @@ robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
 std_msgs::Bool RobotExec::getEnMsg()
 {
     return enable;
+}
+
+// Returns true if within limits, false if limits hit
+bool RobotExec::checkLimit(dir_t dir, arm_t arm, bool printlimit)
+{
+    bool ret;
+    if(arm == ARM_LIFT)
+    {
+        // Going down increases angle
+        float liftAngle = sensors.getLiftPosition();
+        if(dir == DIR_DOWN && liftAngle > liftDownLimit)
+            ret = false;
+        else if(dir == DIR_UP && liftAngle < liftUpLimit)
+            ret = false;
+        else
+            ret = true;
+    }
+    else
+    {
+        // Storage uses limit switches
+        if(dir == DIR_DOWN && sensors.getStorageDownLimit())
+            ret = false;
+        else if(dir == DIR_UP && sensors.getStorageUpLimit())
+            ret = false;
+        else
+            ret = true;
+    }
+
+    if(!ret && printlimit)
+    {
+        const char* dirStr = (dir == DIR_DOWN ? "down" : "up");
+        const char* armStr = (arm == ARM_LIFT ? "lift" : "storage");
+        ROS_DEBUG_STREAM("Hit " << armStr << " " << dirStr << "limit!");
+    }
+    return ret;
 }

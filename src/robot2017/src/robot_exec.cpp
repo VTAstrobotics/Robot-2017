@@ -302,6 +302,16 @@ void RobotExec::motorHeartbeat()
     Bucket.send_Alive();
 }
 
+void RobotExec::enforceLimits()
+{
+    // Check all limits to make sure limits are not
+    // passed when holding down button
+    if(checkLimit(DIR_DOWN, ARM_LIFT) || checkLimit(DIR_UP, ARM_LIFT))
+        Lift.set_Pos(0.0f);
+    if(checkLimit(DIR_DOWN, ARM_STORAGE) || checkLimit(DIR_UP, ARM_STORAGE))
+        Storage.set_Speed(0.0f);
+}
+
 robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
 {
     robot_msgs::MotorFeedback fb;
@@ -377,7 +387,7 @@ bool RobotExec::checkLimit(dir_t dir, arm_t arm, bool printlimit)
     {
         const char* dirStr = (dir == DIR_DOWN ? "down" : "up");
         const char* armStr = (arm == ARM_LIFT ? "lift" : "storage");
-        ROS_DEBUG_STREAM("Hit " << armStr << " " << dirStr << "limit!");
+        ROS_DEBUG_STREAM("Hit " << armStr << " " << dirStr << " limit!");
     }
     return ret;
 }

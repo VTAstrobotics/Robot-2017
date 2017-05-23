@@ -64,6 +64,7 @@ class RobotExec
         bool isDead();
 
         void motorHeartbeat();
+        void enforceLimits();
 
         robot_msgs::MotorFeedback getMotorFeedback();
         std_msgs::Bool getEnMsg();

@@ -316,8 +316,6 @@ robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
     RxData lift_Data = Lift.get_Values();
     RxData bucket_Data = Bucket.get_Values();
 
-    ROS_DEBUG_STREAM_COND(this->isDebugMode(), "GETTING MOTOR DATA");
-
     fb.drumRPM = bucket_Data.rpm;
     fb.drumCurrent = bucket_Data.currentMotor;
 

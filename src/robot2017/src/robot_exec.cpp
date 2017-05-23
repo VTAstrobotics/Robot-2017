@@ -9,8 +9,9 @@
 const char* motorPath = "/dev/ttyO1";  // Connected via UART
 // const char* motorPath = "/dev/ttyUSB0" // Connected via USB
 
-const float liftSpeed    = 5000;  // RPM
-const float storageSpeed = 30000; // RPM
+const int liftSpeedSlow = 5000;  // RPM
+const int liftSpeedFast = 20000; // RPM
+const int storageSpeed  = 30000; // RPM
 
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
     : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
@@ -190,12 +191,13 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 
     // DRUM LIFT
     // positive = down, negative = up
+    int teleopLiftSpeed = (cmd.rb ? liftSpeedSlow : liftSpeedFast);
     if(cmd.y) {
-        Lift.set_Speed(-liftSpeed);
+        Lift.set_Speed(-teleopLiftSpeed);
     }
     else if(cmd.a)
     {
-        Lift.set_Speed(liftSpeed);
+        Lift.set_Speed(teleopLiftSpeed);
     }
     else
     {
@@ -223,10 +225,11 @@ void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
     LeftDrive.set_Duty(cmd.leftRatio);
     RightDrive.set_Duty(cmd.rightRatio);
 
+    int autoLiftSpeed = cmd.liftSpeed;
     if(cmd.liftUp) {
-        Lift.set_Speed(-liftSpeed);
+        Lift.set_Speed(-autoLiftSpeed);
     } else if(cmd.liftDown) {
-        Lift.set_Speed(liftSpeed);
+        Lift.set_Speed(autoLiftSpeed);
     } else {
         Lift.set_Pos(0.0f);
     }

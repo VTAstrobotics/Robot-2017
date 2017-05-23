@@ -2,6 +2,7 @@
 #include "robot_msgs/Teleop.h"
 #include "robot_msgs/Autonomy.h"
 #include "robot_msgs/MotorFeedback.h"
+#include "robot_msgs/Status.h"
 #include <ros/ros.h>
 #include <std_msgs/Int64.h>
 #include <string>
@@ -356,6 +357,17 @@ robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
     fb.storageFault = "";
 
     return fb;
+}
+
+robot_msgs::Status RobotExec::getStatus()
+{
+    robot_msgs::Status status;
+
+    status.robotCodeActive = true;
+    status.autonomyActive  = autonomyActive;
+    status.deadmanPressed  = !dead;
+
+    return status;
 }
 
 std_msgs::Bool RobotExec::getEnMsg()

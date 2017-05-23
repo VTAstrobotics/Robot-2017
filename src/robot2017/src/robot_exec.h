@@ -6,6 +6,7 @@
 #include "robot_msgs/Teleop.h"
 #include "robot_msgs/Autonomy.h"
 #include "robot_msgs/MotorFeedback.h"
+#include "robot_msgs/Status.h"
 #include <std_msgs/Bool.h>
 #include <ros/ros.h>
 #include <vesc_bbb_uart/bldc.h>
@@ -69,6 +70,7 @@ class RobotExec
         void enforceLimits();
 
         robot_msgs::MotorFeedback getMotorFeedback();
+        robot_msgs::Status getStatus();
         std_msgs::Bool getEnMsg();
 };
 

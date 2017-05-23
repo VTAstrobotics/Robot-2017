@@ -26,10 +26,10 @@ robot_msgs::Status status;
 //-aut: Tests autonomy - hardcodes autonomyActive to 1 (true), does not subscribe to teleop messages
 //TODO: any other specific states we want to test?
 
-void publishStatus()
+void publishStatus(RobotExec& exec)
 {
     ROS_DEBUG_STREAM("Publishing status message.");
-    pub_status.publish(status);
+    pub_status.publish(exec.getStatus());
 }
 
 void recievedPing(const std_msgs::Bool& ping)
@@ -69,10 +69,6 @@ int main(int argc, char **argv)
             ROS_WARN_STREAM("Starting in autonomy mode");
         }
     }
-
-    status.robotCodeActive = true;
-    status.autonomyActive = autoEnable;
-    status.deadmanPressed = false;
 
     RobotExec exec(onPC, debug, autoEnable);
     MotorsReceive motors_update(exec);
@@ -123,7 +119,7 @@ int main(int argc, char **argv)
             hibernating = false;
         }
 
-        publishStatus();
+        publishStatus(exec);
 
         // Update autonomy enable status
         if (autonomyEnabled != exec.getEnMsg().data)

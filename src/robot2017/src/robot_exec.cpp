@@ -199,10 +199,12 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     // positive = down, negative = up
     int teleopLiftSpeed = (cmd.rb ? liftSpeedSlow : liftSpeedFast);
     if(cmd.y && checkLimit(DIR_UP, ARM_LIFT)) {
+        lastLiftDir = DIR_UP;
         Lift.set_Speed(-teleopLiftSpeed);
     }
     else if(cmd.a && checkLimit(DIR_DOWN, ARM_LIFT))
     {
+        lastLiftDir = DIR_DOWN;
         Lift.set_Speed(teleopLiftSpeed);
     }
     else
@@ -214,10 +216,12 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     // positive = down, negative = up
     if(cmd.x && checkLimit(DIR_DOWN, ARM_STORAGE))
     {
+        lastStorageDir = DIR_DOWN;
         Storage.set_Speed(storageSpeed);
     }
     else if(cmd.b && checkLimit(DIR_UP, ARM_STORAGE))
     {
+        lastStorageDir = DIR_UP;
         Storage.set_Speed(-storageSpeed);
     }
     else
@@ -306,9 +310,11 @@ void RobotExec::enforceLimits()
 {
     // Check all limits to make sure limits are not
     // passed when holding down button
-    if(checkLimit(DIR_DOWN, ARM_LIFT) || checkLimit(DIR_UP, ARM_LIFT))
+    if((lastLiftDir == DIR_DOWN && !checkLimit(DIR_DOWN, ARM_LIFT))
+    || (lastLiftDir == DIR_UP   && !checkLimit(DIR_UP,   ARM_LIFT)))
         Lift.set_Pos(0.0f);
-    if(checkLimit(DIR_DOWN, ARM_STORAGE) || checkLimit(DIR_UP, ARM_STORAGE))
+    if((lastStorageDir == DIR_DOWN && !checkLimit(DIR_DOWN, ARM_STORAGE))
+    || (lastStorageDir == DIR_UP   && !checkLimit(DIR_UP,   ARM_STORAGE)))
         Storage.set_Speed(0.0f);
 }
 

@@ -75,7 +75,7 @@ int main(int argc, char **argv)
         // TODO add status led code for setting HIBER when ping disconnects
         ros::spinOnce();
         exec.motorHeartbeat();
-        exec.enforceMotorLimits();
+        exec.enforceLimits();
 
         // Update autonomy enable status
         if (autonomyEnabled != exec.getEnMsg().data)

@@ -38,6 +38,8 @@ class RobotExec
         BLDC Storage;
         BLDC Bucket;
         Sensors sensors;
+        dir_t lastLiftDir;
+        dir_t lastStorageDir;
 
         std_msgs::Bool enable;
 

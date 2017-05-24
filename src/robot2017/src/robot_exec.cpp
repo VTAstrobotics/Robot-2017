@@ -19,8 +19,10 @@ const int liftSpeedFast = 20000; // RPM
 const int storageSpeed  = 30000; // RPM
 
 // Actual limits are up:0, down:180
-const int liftDownLimit = 140;
-const int liftUpLimit   = 5;
+const int liftDownLimit    = 175;
+const int liftUpLimit      = 0;
+// Lift must be below this for storage to go up
+const int storageLiftLimit = 105;
 
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
     : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
@@ -378,10 +380,10 @@ std_msgs::Bool RobotExec::getEnMsg()
 bool RobotExec::checkLimit(dir_t dir, arm_t arm, bool printlimit)
 {
     bool ret;
+    float liftAngle = sensors.getLiftPosition();
     if(arm == ARM_LIFT)
     {
         // Going down increases angle
-        float liftAngle = sensors.getLiftPosition();
         if(dir == DIR_DOWN && liftAngle > liftDownLimit)
             ret = false;
         else if(dir == DIR_UP && liftAngle < liftUpLimit)
@@ -391,10 +393,10 @@ bool RobotExec::checkLimit(dir_t dir, arm_t arm, bool printlimit)
     }
     else
     {
-        // Storage uses limit switches
+        // Storage uses limit switches as well as lift angle
         if(dir == DIR_DOWN && sensors.getStorageDownLimit())
             ret = false;
-        else if(dir == DIR_UP && sensors.getStorageUpLimit())
+        else if(dir == DIR_UP && (sensors.getStorageUpLimit() || liftAngle < storageLiftLimit))
             ret = false;
         else
             ret = true;

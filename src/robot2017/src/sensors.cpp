@@ -12,7 +12,7 @@ const int adcRes = 4095;
 
 const int ainLiftPot    = 0;   // AIN0 = P9_39
 const int liftPotDegs   = 250;
-const int liftPotOffset = -15;
+const int liftPotOffset = -25;
 
 Sensors::Sensors(bool onPC) : onPC(onPC)
 {

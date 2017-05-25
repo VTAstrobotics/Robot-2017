@@ -28,7 +28,6 @@ robot_msgs::Status status;
 
 void publishStatus(RobotExec& exec)
 {
-    ROS_DEBUG_STREAM("Publishing status message.");
     pub_status.publish(exec.getStatus());
 }
 

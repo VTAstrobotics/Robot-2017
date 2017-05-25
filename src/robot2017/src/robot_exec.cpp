@@ -17,7 +17,7 @@ const float motorSlowScale = 0.5f;
 
 const int liftSpeedSlow = 5000;  // RPM
 const int liftSpeedFast = 20000; // RPM
-const int storageSpeed  = 30000; // RPM
+const int storageSpeed  = 5000; // RPM
 
 // Actual limits are up:0, down:180
 const int liftDownLimit    = 175;
@@ -410,7 +410,7 @@ bool RobotExec::checkLimit(dir_t dir, arm_t arm, bool printlimit)
 {
     bool ret = true;
     float liftAngle = sensors.getLiftPosition();
-    if(arm == ARM_LIFT && !limitOverride)
+    if(arm == ARM_LIFT)
     {
         // Going down increases angle
         if(dir == DIR_DOWN && liftAngle > liftDownLimit)
@@ -418,7 +418,7 @@ bool RobotExec::checkLimit(dir_t dir, arm_t arm, bool printlimit)
         else if(dir == DIR_UP && liftAngle < liftUpLimit)
             ret = false;
     }
-    else if(arm == ARM_STORAGE)
+    else if(arm == ARM_STORAGE && !limitOverride)
     {
         // Storage uses limit switches as well as lift angle
         // Storage should not move in any direction if lift is up

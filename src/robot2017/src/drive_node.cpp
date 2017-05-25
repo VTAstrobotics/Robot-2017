@@ -43,8 +43,6 @@ int main(int argc, char **argv)
     // initialize the ROS system.
     ros::init(argc, argv, "drive_node");
 
-    lastDriverPing = ros::Time::now() - ros::Duration(100);
-
     // argument processing
     bool onPC = false;
     bool debug = false;
@@ -75,6 +73,7 @@ int main(int argc, char **argv)
 
     // establish this program as an ROS node.
     ros::NodeHandle nh;
+    lastDriverPing = ros::Time::now() - ros::Duration(100);
 
     pub_status = nh.advertise<robot_msgs::Status>("/robot/status", 100);
 

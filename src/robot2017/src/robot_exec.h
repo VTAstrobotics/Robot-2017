@@ -30,6 +30,7 @@ class RobotExec
         bool debug;
         bool autonomyActive;
         bool prevState;
+        bool limitOverride;
 
         float leftRatio;
         float rightRatio;

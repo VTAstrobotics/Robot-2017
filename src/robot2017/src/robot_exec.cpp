@@ -27,7 +27,7 @@ const int storageLiftLimit = 105;
 
 RobotExec::RobotExec(bool onPC, bool debug, bool autoActive)
     : dead(true), onPC(onPC), debug(debug), autonomyActive(autoActive),
-      leftRatio(0.0f), rightRatio(0.0f), sensors(onPC), prevState(false),
+      leftRatio(0.0f), rightRatio(0.0f), sensors(onPC), prevState(false), limitOverride(false),
       LeftDrive(LEFTDRIVE,   Alien_4260),
       RightDrive(RIGHTDRIVE, Alien_4260),
       Lift(LIFT,             Alien_4260),
@@ -123,6 +123,8 @@ void RobotExec::modeTransition(const bool buttonState)
 // Deadman:  L bumper (hold)
 // Slow:     R bumper (hold)
 //  - only applies to lift and drive
+// Limits:   Select
+//  - for overriding limits
 // ==== MOTOR CONTROLS ====
 // Driving:  duty cycle (% voltage, -1.0 to 1.0)
 // Drum:     duty cycle (% voltage, -1.0 to 1.0)
@@ -241,6 +243,13 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     else
     {
         Storage.set_Speed(0.0f);
+    }
+
+    // LIMITS OVERRIDE
+    if(cmd.back)
+    {
+        ROS_DEBUG_STREAM((limitOverride ? "Disabling" : "Enabling") << " limit override");
+        limitOverride = !limitOverride;
     }
 }
 
@@ -379,6 +388,7 @@ robot_msgs::Status RobotExec::getStatus()
     status.robotCodeActive = true;
     status.autonomyActive  = autonomyActive;
     status.deadmanPressed  = !dead;
+    status.limitsOverride  = limitOverride;
 
     return status;
 }
@@ -389,29 +399,26 @@ std_msgs::Bool RobotExec::getEnMsg()
 }
 
 // Returns true if within limits, false if limits hit
+// Limits for lift (not storage) can be overridden in case potentiometer fails
 bool RobotExec::checkLimit(dir_t dir, arm_t arm, bool printlimit)
 {
-    bool ret;
+    bool ret = true;
     float liftAngle = sensors.getLiftPosition();
-    if(arm == ARM_LIFT)
+    if(arm == ARM_LIFT && !limitOverride)
     {
         // Going down increases angle
         if(dir == DIR_DOWN && liftAngle > liftDownLimit)
             ret = false;
         else if(dir == DIR_UP && liftAngle < liftUpLimit)
             ret = false;
-        else
-            ret = true;
     }
-    else
+    else if(arm == ARM_STORAGE)
     {
         // Storage uses limit switches as well as lift angle
         if(dir == DIR_DOWN && sensors.getStorageDownLimit())
             ret = false;
         else if(dir == DIR_UP && (sensors.getStorageUpLimit() || liftAngle < storageLiftLimit))
             ret = false;
-        else
-            ret = true;
     }
 
     if(!ret && printlimit)

@@ -225,7 +225,7 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     }
     else
     {
-        Lift.set_Pos(0.0f);
+        Lift.set_Speed(0.0f);
     }
 
     // SECONDARY STORAGE
@@ -265,7 +265,7 @@ void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
     } else if(cmd.liftDown && checkLimit(DIR_DOWN, ARM_LIFT)) {
         Lift.set_Speed(autoLiftSpeed);
     } else {
-        Lift.set_Pos(0.0f);
+        Lift.set_Speed(0.0f);
     }
 
     if(cmd.storageUp && checkLimit(DIR_UP, ARM_STORAGE)) {
@@ -335,7 +335,7 @@ void RobotExec::enforceLimits()
     // passed when holding down button
     if((lastLiftDir == DIR_DOWN && !checkLimit(DIR_DOWN, ARM_LIFT))
     || (lastLiftDir == DIR_UP   && !checkLimit(DIR_UP,   ARM_LIFT)))
-        Lift.set_Pos(0.0f);
+        Lift.set_Speed(0.0f);
     if((lastStorageDir == DIR_DOWN && !checkLimit(DIR_DOWN, ARM_STORAGE))
     || (lastStorageDir == DIR_UP   && !checkLimit(DIR_UP,   ARM_STORAGE)))
         Storage.set_Speed(0.0f);

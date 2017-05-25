@@ -319,6 +319,12 @@ bool RobotExec::isDead()
     return dead;
 }
 
+// Robot hibernating due to safety ping disable
+void RobotExec::setPingDisabled(bool hiber)
+{
+    sensors.setStatusLed((hiber ? Sensors::HIBER : (dead ? Sensors::READY : Sensors::ACTIVE)));
+}
+
 // Needs to be called frequently, <1s apart
 void RobotExec::motorHeartbeat()
 {
@@ -417,7 +423,7 @@ bool RobotExec::checkLimit(dir_t dir, arm_t arm, bool printlimit)
         // Storage uses limit switches as well as lift angle
         // Storage should not move in any direction if lift is up
         if(liftAngle < storageLiftLimit)
-            ret = false
+            ret = false;
         else if(dir == DIR_DOWN && sensors.getStorageDownLimit())
             ret = false;
         else if(dir == DIR_UP && sensors.getStorageUpLimit())

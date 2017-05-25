@@ -3,7 +3,15 @@
 #include <adc.h>
 
 // GPIOs
-const int gpioStatusLed        = 67; // FIXME get the right pin number for this
+const int gpioStatusLedR       = 61; // GPIO_61 = P8_26
+const int gpioStatusLedG       = 88; // GPIO_88 = P8_28
+const int gpioStatusLedB       = 89; // GPIO_89 = P8_30
+const int gpioValues[3][3] = {
+    {0, 0, 1}, // READY  = blue
+    {0, 1, 0}, // ACTIVE = green
+    {1, 0, 0}  // HIBER  = red
+};
+
 const int gpioStorageDownLimit = 65; // GPIO_65 = P8_18
 const int gpioStorageUpLimit   = 11; // GPIO_11 = P8_32
 
@@ -25,8 +33,12 @@ Sensors::Sensors(bool onPC) : onPC(onPC)
 void Sensors::initGpio()
 {
     // Status LED
-    initPin(gpioStatusLed);
-    setPinDirection(gpioStatusLed, (char*)"out");
+    initPin(gpioStatusLedR);
+    setPinDirection(gpioStatusLedR, (char*)"out");
+    initPin(gpioStatusLedG);
+    setPinDirection(gpioStatusLedG, (char*)"out");
+    initPin(gpioStatusLedB);
+    setPinDirection(gpioStatusLedB, (char*)"out");
 
     // Storage limits
     initPin(gpioStorageDownLimit);
@@ -37,7 +49,10 @@ void Sensors::initGpio()
 
 void Sensors::setStatusLed(status_led_t value)
 {
-    // TODO implement status LED
+    const int* gpios = gpioValues[value];
+    setPinValue(gpioStatusLedR, gpios[0]);
+    setPinValue(gpioStatusLedG, gpios[1]);
+    setPinValue(gpioStatusLedB, gpios[2]);
 }
 
 float Sensors::getLiftPosition()

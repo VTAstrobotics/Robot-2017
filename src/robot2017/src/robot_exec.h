@@ -66,6 +66,7 @@ class RobotExec
         void setAutonomyActive(bool active);
 
         bool isDead();
+        void setPingDisabled(bool hiber);
 
         void motorHeartbeat();
         void enforceLimits();

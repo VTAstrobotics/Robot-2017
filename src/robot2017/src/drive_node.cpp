@@ -89,6 +89,7 @@ int main(int argc, char **argv)
 
     robot_msgs::MotorFeedback motorFb;
 
+    exec.setPingDisabled(false);
     bool autonomyEnabled = false;
 
     ROS_INFO("Astrobotics 2017 ready");
@@ -111,11 +112,13 @@ int main(int argc, char **argv)
             hibernating = true;
             ROS_ERROR_STREAM("Disconnected from driver station");
             exec.killMotors();
+            exec.setPingDisabled(true);
         }
         else if (timeSince <= maxPing && hibernating)
         {
             ROS_INFO_STREAM("Established connection with driver station");
             hibernating = false;
+            exec.setPingDisabled(false);
         }
 
         publishStatus(exec);

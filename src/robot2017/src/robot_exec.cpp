@@ -13,10 +13,11 @@
 
 const char* motorPath = "/dev/ttyO1";  // Connected via UART
 // const char* motorPath = "/dev/ttyUSB0" // Connected via USB
-const float motorSlowScale = 0.5f;
+const float motorFastScale = 0.7f;
+const float motorSlowScale = 0.4f;
 
 const int liftSpeedSlow = 5000;  // RPM
-const int liftSpeedFast = 20000; // RPM
+const int liftSpeedFast = 10000; // RPM
 const int storageSpeed  = 5000; // RPM
 
 // Actual limits are up:0, down:180
@@ -186,6 +187,11 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
         {
             leftRatio  *= motorSlowScale;
             rightRatio *= motorSlowScale;
+        }
+        else
+        {
+            leftRatio  *= motorFastScale;
+            rightRatio *= motorFastScale;
         }
         LeftDrive.set_Duty(leftRatio);
         RightDrive.set_Duty(rightRatio);

@@ -13,12 +13,13 @@
 
 const char* motorPath = "/dev/ttyO1";  // Connected via UART
 // const char* motorPath = "/dev/ttyUSB0" // Connected via USB
-const float motorFastScale = 0.7f;
-const float motorSlowScale = 0.4f;
+const float motorFastScale = 1.0f;
+const float motorSlowScale = 0.5f;
 
-const int liftSpeedSlow = 5000;  // RPM
-const int liftSpeedFast = 10000; // RPM
-const int storageSpeed  = 5000; // RPM
+const int liftSpeedSlow    = 5000;  // RPM
+const int liftSpeedFast    = 10000; // RPM
+const int storageSpeedSlow = 12000; // RPM
+const int storageSpeedFast = 25000; // RPM
 
 // Actual limits are up:0, down:180
 const int liftDownLimit    = 175;
@@ -236,15 +237,16 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
 
     // SECONDARY STORAGE
     // positive = down, negative = up
+    int teleopStorageSpeed = (cmd.rb ? storageSpeedSlow : storageSpeedFast);
     if(cmd.x && checkLimit(DIR_DOWN, ARM_STORAGE))
     {
         lastStorageDir = DIR_DOWN;
-        Storage.set_Speed(storageSpeed);
+        Storage.set_Speed(teleopStorageSpeed);
     }
     else if(cmd.b && checkLimit(DIR_UP, ARM_STORAGE))
     {
         lastStorageDir = DIR_UP;
-        Storage.set_Speed(-storageSpeed);
+        Storage.set_Speed(-teleopStorageSpeed);
     }
     else
     {
@@ -275,9 +277,9 @@ void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
     }
 
     if(cmd.storageUp && checkLimit(DIR_UP, ARM_STORAGE)) {
-        Storage.set_Speed(-storageSpeed);
+        Storage.set_Speed(-storageSpeedSlow);
     } else if(cmd.storageDown && checkLimit(DIR_DOWN, ARM_STORAGE)) {
-        Storage.set_Speed(storageSpeed);
+        Storage.set_Speed(storageSpeedSlow);
     } else {
         Storage.set_Speed(0.0f);
     }

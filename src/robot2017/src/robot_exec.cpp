@@ -422,7 +422,7 @@ bool RobotExec::checkLimit(dir_t dir, arm_t arm, bool printlimit)
 {
     bool ret = true;
     float liftAngle = sensors.getLiftPosition();
-    if(arm == ARM_LIFT)
+    if(arm == ARM_LIFT && !limitOverride)
     {
         // Going down increases angle
         if(dir == DIR_DOWN && liftAngle > liftDownLimit)
@@ -430,11 +430,11 @@ bool RobotExec::checkLimit(dir_t dir, arm_t arm, bool printlimit)
         else if(dir == DIR_UP && liftAngle < liftUpLimit)
             ret = false;
     }
-    else if(arm == ARM_STORAGE && !limitOverride)
+    else if(arm == ARM_STORAGE)
     {
         // Storage uses limit switches as well as lift angle
         // Storage should not move in any direction if lift is up
-        if(liftAngle < storageLiftLimit)
+        if(liftAngle < storageLiftLimit && !limitOverride)
             ret = false;
         else if(dir == DIR_DOWN && sensors.getStorageDownLimit())
             ret = false;

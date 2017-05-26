@@ -378,7 +378,9 @@ robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
     fb.liftCurrent = lift_Data.currentMotor;
 
     fb.leftTreadRPM = left_Data.rpm;
+    fb.leftTreadCurrent = left_Data.currentMotor;
     fb.rightTreadRPM = right_Data.rpm;
+    fb.rightTreadCurrent = right_Data.currentMotor;
 
     fb.storageDownLimit = sensors.getStorageDownLimit();
     fb.storageUpLimit = sensors.getStorageUpLimit();

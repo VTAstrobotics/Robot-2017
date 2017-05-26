@@ -366,6 +366,7 @@ robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
     RxData right_Data = RightDrive.get_Values();
     RxData lift_Data = Lift.get_Values();
     RxData bucket_Data = Bucket.get_Values();
+    RxData storage_Data = Storage.get_Values();
 
     fb.drumRPM = bucket_Data.rpm;
     fb.drumCurrent = bucket_Data.currentMotor;
@@ -381,6 +382,7 @@ robot_msgs::MotorFeedback RobotExec::getMotorFeedback()
 
     fb.storageDownLimit = sensors.getStorageDownLimit();
     fb.storageUpLimit = sensors.getStorageUpLimit();
+    fb.storageCurrent = storage_Data.currentMotor;
 
     fb.batVoltage = lift_Data.voltageIn;
 

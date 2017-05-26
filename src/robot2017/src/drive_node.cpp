@@ -88,7 +88,7 @@ int main(int argc, char **argv)
 
     robot_msgs::MotorFeedback motorFb;
 
-    exec.setPingDisabled(false);
+    exec.setPingDisabled(true);
     bool autonomyEnabled = false;
 
     ROS_INFO("Astrobotics 2017 ready");

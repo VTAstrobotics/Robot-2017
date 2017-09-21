@@ -16,14 +16,15 @@ const char* motorPath = "/dev/ttyO1";  // Connected via UART
 const float motorFastScale = 1.0f;
 const float motorSlowScale = 0.5f;
 
-const int liftSpeedSlow    = 5000;  // RPM
-const int liftSpeedFast    = 10000; // RPM
-const int storageSpeedSlow = 12000; // RPM
-const int storageSpeedFast = 25000; // RPM
+const int   liftSpeedSlow    = 5000;  // RPM
+const int   liftSpeedFast    = 10000; // RPM
+const float liftBrakeCurrent = 8.0f;
+const int   storageSpeedSlow = 12000; // RPM
+const int   storageSpeedFast = 25000; // RPM
 
 // Actual limits are up:0, down:180
 const int liftDownLimit    = 175;
-const int liftUpLimit      = 0;
+const int liftUpLimit      = 4;
 // Lift must be below this for storage to move
 const int storageLiftLimit = 105;
 
@@ -232,7 +233,7 @@ void RobotExec::teleopExec(const robot_msgs::Teleop& cmd)
     }
     else
     {
-        Lift.set_Speed(0.0f);
+        Lift.apply_Brake(liftBrakeCurrent);
     }
 
     // SECONDARY STORAGE
@@ -273,7 +274,7 @@ void RobotExec::autonomyExec(const robot_msgs::Autonomy& cmd)
     } else if(cmd.liftDown && checkLimit(DIR_DOWN, ARM_LIFT)) {
         Lift.set_Speed(autoLiftSpeed);
     } else {
-        Lift.set_Speed(0.0f);
+        Lift.apply_Brake(liftBrakeCurrent);
     }
 
     if(cmd.storageUp && checkLimit(DIR_UP, ARM_STORAGE)) {
@@ -293,6 +294,7 @@ void RobotExec::killMotors()
     LeftDrive.set_Speed(0);
     RightDrive.set_Speed(0);
     Lift.set_Speed(0);
+    Lift.apply_Brake(liftBrakeCurrent);
     Storage.set_Speed(0);
     Bucket.set_Speed(0);
 }
@@ -349,7 +351,7 @@ void RobotExec::enforceLimits()
     // passed when holding down button
     if((lastLiftDir == DIR_DOWN && !checkLimit(DIR_DOWN, ARM_LIFT))
     || (lastLiftDir == DIR_UP   && !checkLimit(DIR_UP,   ARM_LIFT)))
-        Lift.set_Speed(0.0f);
+        Lift.apply_Brake(liftBrakeCurrent);
     if((lastStorageDir == DIR_DOWN && !checkLimit(DIR_DOWN, ARM_STORAGE))
     || (lastStorageDir == DIR_UP   && !checkLimit(DIR_UP,   ARM_STORAGE)))
         Storage.set_Speed(0.0f);
